@@ -1,5 +1,5 @@
 {
-  "name": "Coldboard",
+  "name": "coldboard",
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
@@ -33,6 +33,7 @@
     "@opentelemetry/api-logs": "^0.57.2",
     "@opentelemetry/instrumentation": "^0.57.2",
     "@opentelemetry/sdk-logs": "^0.57.2",
+    "@opentelemetry/sdk-trace-base": "^1.19.0",
     "@prisma/client": "^6.10.1",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-avatar": "^1.1.10",
@@ -63,7 +64,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.54.1",
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.1.11",
     "@testing-library/jest-dom": "^6.6.3",
     "@types/jest": "^30.0.0",
     "@types/node": "^20",

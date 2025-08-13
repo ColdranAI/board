@@ -1,0 +1,21 @@
+zerops:
+  - setup: app
+    build:
+      base: nodejs@22
+      buildCommands:
+        - pnpm i
+        - pnpm run build
+        - pnpm run db:push
+      
+      cache:
+      - pnpm-lock.yaml
+      - node_modules
+
+      deployFiles: ./
+
+    run:
+      base: nodejs@22
+      ports:
+        - port: 3000
+          httpSupport: true
+      start: pnpm start

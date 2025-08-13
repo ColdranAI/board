@@ -1,0 +1,25 @@
+#yamlPreprocessor=on
+project:
+  name: ColdBoard    
+
+services:
+  - hostname: db
+    type: postgresql@16
+    mode: NON_HA
+    priority: 10
+
+  - hostname: app
+    type: nodejs@22
+    buildFromGit: https://github.com/zeropsio/recipe-rag-starter
+    enableSubdomainAccess: true
+    envSecrets:
+      DATABASE_URL: postgresql://${db_user}:${db_password}@${db_hostname}:${db_port}/${db_dbName}
+      AUTH_URL: https://board.coldran.com
+      AUTH_SECRET: <@generateRandomString(<32>)>
+      AUTH_RESEND_KEY:
+      EMAIL_FROM: board@coldran.com
+      GOOGLE_CLIENT_ID:
+      GOOGLE_CLIENT_SECRET: 
+      GITHUB_CLIENT_ID: 
+      GITHUB_CLIENT_SECRET:
+      NODE_ENV: production
