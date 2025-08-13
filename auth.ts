@@ -1,50 +1,6 @@
-<<<<<<< Updated upstream
-import NextAuth from "next-auth";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import Resend from "next-auth/providers/resend";
-import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
-import { db as drizzle } from "@/lib/db";
-import { env } from "@/lib/env";
-
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: DrizzleAdapter(drizzle),
-  providers: [
-    Resend({
-      from: env.EMAIL_FROM,
-    }),
-    GoogleProvider({
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-      allowDangerousEmailAccountLinking: true,
-    }),
-    GitHubProvider({
-      clientId: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET,
-      allowDangerousEmailAccountLinking: true,
-    }),
-  ],
-  pages: {
-    signIn: "/auth/signin",
-    verifyRequest: "/auth/verify-request",
-    error: "/auth/error",
-  },
-  callbacks: {
-    async signIn() {
-      return true;
-    },
-    async redirect({ url, baseUrl }) {
-      if (url.includes("/invite/accept")) {
-        return url.startsWith("/") ? `${baseUrl}${url}` : url;
-      }
-      if (url.startsWith("/")) return `${baseUrl}/dashboard`;
-      else if (new URL(url).origin === baseUrl) return url;
-      return `${baseUrl}/dashboard`;
-    },
-  },
-=======
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { magicLink } from "better-auth/plugins";
 import { db } from "@/lib/db";
 import { users, accounts, sessions, verificationTokens } from "@/lib/db/schema";
 import { Resend } from "resend";
@@ -74,6 +30,27 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
+  
+  plugins: [
+    magicLink({
+      sendMagicLink: async ({ email, token, url }) => {
+        await sendEmail({
+          to: email,
+          subject: "Sign in to Coldboard",
+          text: `Click the link to sign in: ${url}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2>Sign in to Coldboard</h2>
+              <p>Click the button below to sign in to your account:</p>
+              <a href="${url}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Sign In</a>
+              <p>If the button doesn't work, copy and paste this link: ${url}</p>
+              <p>This link will expire in 24 hours.</p>
+            </div>
+          `,
+        });
+      },
+    }),
+  ],
   
   emailAndPassword: {
     enabled: true,
@@ -129,5 +106,4 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day
   },
->>>>>>> Stashed changes
 });
