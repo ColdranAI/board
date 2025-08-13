@@ -125,6 +125,7 @@ export async function POST(request: NextRequest) {
         color: randomColor,
         boardId,
         createdBy: session.user.id,
+        createdAt: new Date(),
         updatedAt: new Date(),
       })
       .returning();

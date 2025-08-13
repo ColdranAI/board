@@ -101,6 +101,7 @@ export async function POST(request: NextRequest) {
           organizationId: user[0].organizationId,
           invitedBy: session.user.id,
           status: "PENDING",
+          createdAt: new Date(),
         })
         .returning();
     }

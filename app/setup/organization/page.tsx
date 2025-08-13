@@ -3,6 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { users, organizations, organizationInvites } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { Resend } from "resend";
 import OrganizationSetupForm from "./form";
 import { env } from "@/lib/env";
@@ -21,30 +23,42 @@ async function createOrganization(orgName: string, teamEmails: string[]) {
     throw new Error("Organization name is required");
   }
 
-  const organization = await db.organization.create({
-    data: {
+  const organizationResult = await db
+    .insert(organizations)
+    .values({
+      id: crypto.randomUUID(),
       name: orgName.trim(),
-    },
-  });
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .returning();
 
-  await db.user.update({
-    where: { id: session.user.id },
-    data: {
+  const organization = organizationResult[0];
+
+  await db
+    .update(users)
+    .set({
       organizationId: organization.id,
       isAdmin: true,
-    },
-  });
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, session.user.id));
 
   if (teamEmails.length > 0) {
     for (const email of teamEmails) {
       try {
-        const invite = await db.organizationInvite.create({
-          data: {
+        const inviteResult = await db
+          .insert(organizationInvites)
+          .values({
+            id: crypto.randomUUID(),
             email,
             organizationId: organization.id,
             invitedBy: session.user.id!,
-          },
-        });
+            createdAt: new Date(),
+          })
+          .returning();
+
+        const invite = inviteResult[0];
 
         await resend.emails.send({
           from: env.EMAIL_FROM!,
@@ -85,10 +99,21 @@ export default async function OrganizationSetup() {
     redirect("/setup/profile");
   }
 
-  const user = await db.user.findUnique({
-    where: { id: session.user.id },
-    include: { organization: true },
-  });
+  const userResult = await db
+    .select({
+      id: users.id,
+      organizationId: users.organizationId,
+      organization: {
+        id: organizations.id,
+        name: organizations.name,
+      },
+    })
+    .from(users)
+    .leftJoin(organizations, eq(users.organizationId, organizations.id))
+    .where(eq(users.id, session.user.id))
+    .limit(1);
+
+  const user = userResult[0];
 
   if (user?.organization) {
     redirect("/dashboard");

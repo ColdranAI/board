@@ -1,5 +1,7 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { users, organizations, organizationSelfServeInvites } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(
@@ -16,10 +18,22 @@ export async function DELETE(
     const inviteId = (await params).id;
 
     // Get user with organization
-    const user = await db.user.findUnique({
-      where: { id: session.user.id },
-      include: { organization: true },
-    });
+    const userResult = await db
+      .select({
+        id: users.id,
+        organizationId: users.organizationId,
+        isAdmin: users.isAdmin,
+        organization: {
+          id: organizations.id,
+          name: organizations.name,
+        },
+      })
+      .from(users)
+      .leftJoin(organizations, eq(users.organizationId, organizations.id))
+      .where(eq(users.id, session.user.id))
+      .limit(1);
+
+    const user = userResult[0];
 
     if (!user?.organizationId) {
       return NextResponse.json({ error: "No organization found" }, { status: 404 });
@@ -34,9 +48,16 @@ export async function DELETE(
     }
 
     // Verify the invite belongs to this organization
-    const invite = await db.organizationSelfServeInvite.findUnique({
-      where: { token: inviteId },
-    });
+    const inviteResult = await db
+      .select({
+        token: organizationSelfServeInvites.token,
+        organizationId: organizationSelfServeInvites.organizationId,
+      })
+      .from(organizationSelfServeInvites)
+      .where(eq(organizationSelfServeInvites.token, inviteId))
+      .limit(1);
+
+    const invite = inviteResult[0];
 
     if (!invite) {
       return NextResponse.json({ error: "Invite not found" }, { status: 404 });
@@ -47,9 +68,9 @@ export async function DELETE(
     }
 
     // Delete the invite
-    await db.organizationSelfServeInvite.delete({
-      where: { token: inviteId },
-    });
+    await db
+      .delete(organizationSelfServeInvites)
+      .where(eq(organizationSelfServeInvites.token, inviteId));
 
     return NextResponse.json({ success: true });
   } catch (error) {

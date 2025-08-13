@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { users, organizations } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 async function updateUserName(formData: FormData) {
   "use server";
@@ -19,16 +21,30 @@ async function updateUserName(formData: FormData) {
     throw new Error("Name is required");
   }
 
-  await db.user.update({
-    where: { id: session.user.id },
-    data: { name: name.trim() },
-  });
+  await db
+    .update(users)
+    .set({
+      name: name.trim(),
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, session.user.id));
 
   // Check if user has organization, redirect accordingly
-  const user = await db.user.findUnique({
-    where: { id: session.user.id },
-    include: { organization: true },
-  });
+  const userResult = await db
+    .select({
+      id: users.id,
+      organizationId: users.organizationId,
+      organization: {
+        id: organizations.id,
+        name: organizations.name,
+      },
+    })
+    .from(users)
+    .leftJoin(organizations, eq(users.organizationId, organizations.id))
+    .where(eq(users.id, session.user.id))
+    .limit(1);
+
+  const user = userResult[0];
 
   if (!user?.organization) {
     redirect("/setup/organization");
@@ -46,10 +62,21 @@ export default async function ProfileSetup() {
 
   // If user already has a name, check organization setup
   if (session.user.name) {
-    const user = await db.user.findUnique({
-      where: { id: session.user.id },
-      include: { organization: true },
-    });
+    const userResult = await db
+      .select({
+        id: users.id,
+        organizationId: users.organizationId,
+        organization: {
+          id: organizations.id,
+          name: organizations.name,
+        },
+      })
+      .from(users)
+      .leftJoin(organizations, eq(users.organizationId, organizations.id))
+      .where(eq(users.id, session.user.id))
+      .limit(1);
+
+    const user = userResult[0];
 
     if (!user?.organization) {
       redirect("/setup/organization");

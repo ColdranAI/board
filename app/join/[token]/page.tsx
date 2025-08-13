@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { users, organizations, organizationSelfServeInvites, sessions } from "@/lib/db/schema";
+import { eq, and } from "drizzle-orm";
 
 async function joinOrganization(token: string) {
   "use server";
@@ -14,10 +16,25 @@ async function joinOrganization(token: string) {
   }
 
   // Find the self-serve invite by token
-  const invite = await db.organizationSelfServeInvite.findUnique({
-    where: { token: token },
-    include: { organization: true },
-  });
+  const inviteResult = await db
+    .select({
+      token: organizationSelfServeInvites.token,
+      organizationId: organizationSelfServeInvites.organizationId,
+      isActive: organizationSelfServeInvites.isActive,
+      expiresAt: organizationSelfServeInvites.expiresAt,
+      usageLimit: organizationSelfServeInvites.usageLimit,
+      usageCount: organizationSelfServeInvites.usageCount,
+      organization: {
+        id: organizations.id,
+        name: organizations.name,
+      },
+    })
+    .from(organizationSelfServeInvites)
+    .leftJoin(organizations, eq(organizationSelfServeInvites.organizationId, organizations.id))
+    .where(eq(organizationSelfServeInvites.token, token))
+    .limit(1);
+
+  const invite = inviteResult[0];
 
   if (!invite) {
     throw new Error("Invalid or expired invitation link");
@@ -38,10 +55,21 @@ async function joinOrganization(token: string) {
   }
 
   // Check if user is already in an organization
-  const user = await db.user.findUnique({
-    where: { id: session.user.id },
-    include: { organization: true },
-  });
+  const userResult = await db
+    .select({
+      id: users.id,
+      organizationId: users.organizationId,
+      organization: {
+        id: organizations.id,
+        name: organizations.name,
+      },
+    })
+    .from(users)
+    .leftJoin(organizations, eq(users.organizationId, organizations.id))
+    .where(eq(users.id, session.user.id))
+    .limit(1);
+
+  const user = userResult[0];
 
   if (user?.organizationId === invite.organizationId) {
     throw new Error("You are already a member of this organization");
@@ -54,16 +82,21 @@ async function joinOrganization(token: string) {
   }
 
   // Join the organization
-  await db.user.update({
-    where: { id: session.user.id },
-    data: { organizationId: invite.organizationId },
-  });
+  await db
+    .update(users)
+    .set({
+      organizationId: invite.organizationId,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, session.user.id));
 
   // Increment usage count
-  await db.organizationSelfServeInvite.update({
-    where: { token: token },
-    data: { usageCount: { increment: 1 } },
-  });
+  await db
+    .update(organizationSelfServeInvites)
+    .set({
+      usageCount: invite.usageCount + 1,
+    })
+    .where(eq(organizationSelfServeInvites.token, token));
 
   redirect("/dashboard");
 }
@@ -78,10 +111,25 @@ async function autoCreateAccountAndJoin(token: string, formData: FormData) {
 
   try {
     // Find the self-serve invite by token
-    const invite = await db.organizationSelfServeInvite.findUnique({
-      where: { token: token },
-      include: { organization: true },
-    });
+    const inviteResult = await db
+      .select({
+        token: organizationSelfServeInvites.token,
+        organizationId: organizationSelfServeInvites.organizationId,
+        isActive: organizationSelfServeInvites.isActive,
+        expiresAt: organizationSelfServeInvites.expiresAt,
+        usageLimit: organizationSelfServeInvites.usageLimit,
+        usageCount: organizationSelfServeInvites.usageCount,
+        organization: {
+          id: organizations.id,
+          name: organizations.name,
+        },
+      })
+      .from(organizationSelfServeInvites)
+      .leftJoin(organizations, eq(organizationSelfServeInvites.organizationId, organizations.id))
+      .where(eq(organizationSelfServeInvites.token, token))
+      .limit(1);
+
+    const invite = inviteResult[0];
 
     if (!invite || !invite.isActive) {
       throw new Error("Invalid or inactive invitation link");
@@ -98,25 +146,46 @@ async function autoCreateAccountAndJoin(token: string, formData: FormData) {
     }
 
     // Check if user already exists
-    let user = await db.user.findUnique({
-      where: { email },
-    });
+    const existingUserResult = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        emailVerified: users.emailVerified,
+        organizationId: users.organizationId,
+      })
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+
+    let user = existingUserResult[0];
 
     // If user doesn't exist, create one with verified email and auto-join organization
     if (!user) {
-      user = await db.user.create({
-        data: {
+      const newUserResult = await db
+        .insert(users)
+        .values({
+          id: crypto.randomUUID(),
           email,
           emailVerified: new Date(), // Auto-verify since they clicked the invite link
           organizationId: invite.organizationId, // Auto-join the organization
-        },
-      });
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
+      
+      user = newUserResult[0];
     } else if (!user.organizationId) {
       // If user exists but isn't in an organization, add them to this one
-      user = await db.user.update({
-        where: { id: user.id },
-        data: { organizationId: invite.organizationId },
-      });
+      const updatedUserResult = await db
+        .update(users)
+        .set({
+          organizationId: invite.organizationId,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, user.id))
+        .returning();
+      
+      user = updatedUserResult[0];
     } else if (user.organizationId === invite.organizationId) {
       // User is already in this organization, just continue
     } else {
@@ -125,31 +194,37 @@ async function autoCreateAccountAndJoin(token: string, formData: FormData) {
 
     // Verify email if not already verified
     if (!user.emailVerified) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { emailVerified: new Date() },
-      });
+      await db
+        .update(users)
+        .set({
+          emailVerified: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, user.id));
     }
 
     // Increment usage count only if this is a new join
     if (user.organizationId === invite.organizationId) {
-      await db.organizationSelfServeInvite.update({
-        where: { token: token },
-        data: { usageCount: { increment: 1 } },
-      });
+      await db
+        .update(organizationSelfServeInvites)
+        .set({
+          usageCount: invite.usageCount + 1,
+        })
+        .where(eq(organizationSelfServeInvites.token, token));
     }
 
     // Create a session for the user
     const sessionToken = crypto.randomUUID();
     const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
 
-    await db.session.create({
-      data: {
+    await db
+      .insert(sessions)
+      .values({
+        id: crypto.randomUUID(),
         sessionToken,
         userId: user.id,
         expires,
-      },
-    });
+      });
 
     // Redirect to a special endpoint that will set the session cookie and redirect to dashboard
     redirect(
@@ -194,13 +269,32 @@ export default async function JoinPage({ params }: JoinPageProps) {
   }
 
   // Find the self-serve invite by token
-  const invite = await db.organizationSelfServeInvite.findUnique({
-    where: { token: token },
-    include: {
-      organization: true,
-      user: true, // The user who created the invite
-    },
-  });
+  const inviteResult = await db
+    .select({
+      token: organizationSelfServeInvites.token,
+      name: organizationSelfServeInvites.name,
+      organizationId: organizationSelfServeInvites.organizationId,
+      isActive: organizationSelfServeInvites.isActive,
+      expiresAt: organizationSelfServeInvites.expiresAt,
+      usageLimit: organizationSelfServeInvites.usageLimit,
+      usageCount: organizationSelfServeInvites.usageCount,
+      organization: {
+        id: organizations.id,
+        name: organizations.name,
+      },
+      user: {
+        id: users.id,
+        name: users.name,
+        email: users.email,
+      },
+    })
+    .from(organizationSelfServeInvites)
+    .leftJoin(organizations, eq(organizationSelfServeInvites.organizationId, organizations.id))
+    .leftJoin(users, eq(organizationSelfServeInvites.createdBy, users.id))
+    .where(eq(organizationSelfServeInvites.token, token))
+    .limit(1);
+
+  const invite = inviteResult[0];
 
   if (!invite) {
     return (
@@ -360,10 +454,21 @@ export default async function JoinPage({ params }: JoinPageProps) {
   }
 
   // Check if user is already in an organization
-  const user = await db.user.findUnique({
-    where: { id: session.user.id },
-    include: { organization: true },
-  });
+  const userResult = await db
+    .select({
+      id: users.id,
+      organizationId: users.organizationId,
+      organization: {
+        id: organizations.id,
+        name: organizations.name,
+      },
+    })
+    .from(users)
+    .leftJoin(organizations, eq(users.organizationId, organizations.id))
+    .where(eq(users.id, session.user.id))
+    .limit(1);
+
+  const user = userResult[0];
 
   if (user?.organizationId === invite.organizationId) {
     return (
