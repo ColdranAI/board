@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { db } from "@/lib/db";
+import { headers } from "next/headers";import { db } from "@/lib/db";
 import {
   sendSlackMessage,
   formatNoteForSlack,
@@ -14,7 +14,7 @@ import { boards, notes, users, organizations, checklistItems } from "@/lib/db/sc
 // Get all notes for a board
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: await headers() });
     const boardId = (await params).id;
 
     const board = await db
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 // Create a new note
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

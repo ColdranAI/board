@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { headers } from "next/headers";
 import { Button } from "@/components/ui/button";
 import { StickyNote, Users, Building2 } from "lucide-react";
 import { StickyNotesDemo } from "@/components/sticky-notes-demo";
@@ -9,7 +10,7 @@ import Image from "next/image";
 import { BetaBadge } from "@/components/ui/beta-badge";
 
 export default async function HomePage() {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
 
   if (session?.user) {
     redirect("/dashboard");

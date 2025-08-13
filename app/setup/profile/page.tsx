@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { headers } from "next/headers";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,7 @@ import { eq } from "drizzle-orm";
 async function updateUserName(formData: FormData) {
   "use server";
 
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   const userId = session?.user?.id;
   if (!userId) {
     throw new Error("Not authenticated");
@@ -53,7 +54,7 @@ async function updateUserName(formData: FormData) {
 
 
 export default async function ProfileSetup() {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   const userId = session?.user?.id;
 
   if (!session?.user || !userId) {

@@ -1,12 +1,12 @@
 import { auth } from "@/auth";
-import { db } from "@/lib/db";
+import { headers } from "next/headers";import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { eq, and, isNotNull, isNull, desc } from "drizzle-orm";
 import { users, notes, boards, checklistItems } from "@/lib/db/schema";
 
 export async function GET() {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

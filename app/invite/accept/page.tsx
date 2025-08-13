@@ -5,11 +5,12 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { users, sessions, organizationInvites, organizations } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
 
 async function acceptInvite(token: string) {
   "use server";
 
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user?.email) {
     throw new Error("Not authenticated");
   }
@@ -71,7 +72,7 @@ async function acceptInvite(token: string) {
 async function declineInvite(token: string) {
   "use server";
 
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user?.email) {
     throw new Error("Not authenticated");
   }
@@ -157,23 +158,11 @@ async function autoVerifyAndCreateSession(email: string, token: string) {
       user = updatedUserResult[0];
     }
 
-    // Create a session for the user
-    const sessionToken = crypto.randomUUID();
-    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
-
-    await db
-      .insert(sessions)
-      .values({
-        id: crypto.randomUUID(),
-        sessionToken,
-        userId: user.id,
-        expires,
-      });
-
-    // Redirect to a special endpoint that will set the session cookie and redirect back
+    // Redirect to signin with email prefilled
     redirect(
-      `/api/auth/set-session?token=${sessionToken}&redirectTo=${encodeURIComponent(`/invite/accept?token=${token}&verified=true`)}`
+      `/auth/signin?email=${encodeURIComponent(email)}&callbackUrl=${encodeURIComponent(`/invite/accept?token=${token}&verified=true`)}`
     );
+
   } catch (error) {
     console.error("Auto-verification error:", error);
     // Fallback to regular auth flow
@@ -191,7 +180,7 @@ interface InviteAcceptPageProps {
 }
 
 export default async function InviteAcceptPage({ searchParams }: InviteAcceptPageProps) {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   const resolvedSearchParams = await searchParams;
   const token = resolvedSearchParams.token;
   const isJustVerified = resolvedSearchParams.verified === "true";

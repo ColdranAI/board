@@ -6,11 +6,12 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { users, organizations, organizationSelfServeInvites, sessions } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
+import { headers } from "next/headers";
 
 async function joinOrganization(token: string) {
   "use server";
 
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user?.id || !session?.user?.email) {
     throw new Error("Not authenticated");
   }
@@ -226,9 +227,9 @@ async function autoCreateAccountAndJoin(token: string, formData: FormData) {
         expires,
       });
 
-    // Redirect to a special endpoint that will set the session cookie and redirect to dashboard
+    // Redirect to signin for authentication
     redirect(
-      `/api/auth/set-session?token=${sessionToken}&redirectTo=${encodeURIComponent("/dashboard")}`
+      `/auth/signin?email=${encodeURIComponent(email)}&callbackUrl=${encodeURIComponent("/dashboard")}`
     );
   } catch (error) {
     console.error("Auto-join error:", error);
@@ -246,7 +247,7 @@ interface JoinPageProps {
 }
 
 export default async function JoinPage({ params }: JoinPageProps) {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   const { token } = await params;
 
   if (!token) {

@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { headers } from "next/headers";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { redirect } from "next/navigation";
@@ -14,7 +15,7 @@ const resend = new Resend(process.env.AUTH_RESEND_KEY);
 async function createOrganization(orgName: string, teamEmails: string[]) {
   "use server";
 
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session?.user?.id) {
   redirect("/auth/signin");
@@ -70,7 +71,7 @@ async function createOrganization(orgName: string, teamEmails: string[]) {
               <h2>You&apos;re invited to join ${orgName}!</h2>
               <p>${session.user.name} (${session.user.email}) has invited you to join their organization on Coldboard.</p>
               <p>Click the link below to accept the invitation:</p>
-              <a href="${env.AUTH_URL}/invite/accept?token=${invite.id}"
+              <a href="${env.NEXT_PUBLIC_BETTER_AUTH_URL}/invite/accept?token=${invite.id}"
                  style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
                 Accept Invitation
               </a>
@@ -90,7 +91,7 @@ async function createOrganization(orgName: string, teamEmails: string[]) {
 }
 
 export default async function OrganizationSetup() {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session?.user) {
     redirect("/auth/signin");
