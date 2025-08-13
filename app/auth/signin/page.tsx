@@ -1,12 +1,8 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-<<<<<<< Updated upstream
-import { signIn } from "next-auth/react";
-=======
 import { authClient } from "@/lib/auth-client";
 const { signIn } = authClient;
->>>>>>> Stashed changes
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Card,
@@ -53,15 +49,12 @@ function SignInContent() {
     setIsLoading(true);
     try {
       const callbackUrl = searchParams.get("callbackUrl") || "/";
-<<<<<<< Updated upstream
       await signIn("resend", {
         email,
         redirect: false,
         callbackUrl,
       });
-=======
       await signIn.email({ email, password: "" }); // Magic link via email
->>>>>>> Stashed changes
       setIsSubmitted(true);
     } catch (error) {
       console.error("Sign in error:", error);
@@ -74,15 +67,13 @@ function SignInContent() {
     setIsResending(true);
     try {
       const callbackUrl = searchParams.get("callbackUrl") || "/";
-<<<<<<< Updated upstream
+
       await signIn("resend", {
         email,
         redirect: false,
         callbackUrl,
       });
-=======
       await signIn.email({ email, password: "" }); // Magic link via email
->>>>>>> Stashed changes
       setIsResent(true);
       setTimeout(() => {
         setIsResent(false);

@@ -4,6 +4,7 @@ zerops:
       base: nodejs@22
       envVariables:
         DATABASE_URL: ${RUNTIME_DATABASE_URL}
+        NEXT_PUBLIC_BETTER_AUTH_URL: ${RUNTIME_NEXT_PUBLIC_BETTER_AUTH_URL}
         AUTH_RESEND_KEY: ${RUNTIME_AUTH_RESEND_KEY}
       buildCommands:
         - pnpm i
