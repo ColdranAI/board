@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { magicLink } from "better-auth/plugins";
 import { db } from "@/lib/db";
-import { users, accounts, sessions, verificationTokens } from "@/lib/db/schema";
+import { users, accounts, sessions, verification } from "@/lib/db/schema";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.AUTH_RESEND_KEY);
@@ -29,6 +29,12 @@ async function sendEmail({ to, subject, text, html }: { to: string; subject: str
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
+    schema: {
+      user: users,
+      account: accounts,
+      session: sessions,
+      verification: verification,
+    },
   }),
   
   plugins: [

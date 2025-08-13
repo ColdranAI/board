@@ -19,19 +19,20 @@ export const accounts = pgTable(
   {
     id: text("id").primaryKey(),
     userId: text("userId").notNull(),
-    type: text("type").notNull(),
-    provider: text("provider").notNull(),
-    providerAccountId: text("providerAccountId").notNull(),
-    refresh_token: text("refresh_token"),
-    access_token: text("access_token"),
-    expires_at: integer("expires_at"),
-    token_type: text("token_type"),
+    accountId: text("accountId").notNull(),
+    providerId: text("providerId").notNull(),
+    accessToken: text("accessToken"),
+    refreshToken: text("refreshToken"),
+    idToken: text("idToken"),
+    accessTokenExpiresAt: timestamp("accessTokenExpiresAt"),
+    refreshTokenExpiresAt: timestamp("refreshTokenExpiresAt"),
     scope: text("scope"),
-    id_token: text("id_token"),
-    session_state: text("session_state"),
+    password: text("password"),
+    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
   },
   (table) => ({
-    providerProviderAccountIdIdx: unique().on(table.provider, table.providerAccountId),
+    providerAccountIdIdx: unique().on(table.providerId, table.accountId),
   })
 );
 
@@ -49,7 +50,7 @@ export const users = pgTable("users", {
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
   createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt", { mode: "date" }).notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
   organizationId: text("organizationId"),
   isAdmin: boolean("isAdmin").default(false).notNull(),
 });
@@ -59,7 +60,7 @@ export const organizations = pgTable("organizations", {
   name: text("name").notNull(),
   slackWebhookUrl: text("slackWebhookUrl"),
   createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt", { mode: "date" }).notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
 });
 
 export const boards = pgTable(
@@ -73,7 +74,7 @@ export const boards = pgTable(
     organizationId: text("organizationId").notNull(),
     createdBy: text("createdBy").notNull(),
     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updatedAt", { mode: "date" }).notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
   },
   (table) => ({
     idxBoardOrgCreated: index("idx_board_org_created").on(table.organizationId, table.createdAt),
@@ -91,7 +92,7 @@ export const notes = pgTable(
     boardId: text("boardId").notNull(),
     createdBy: text("createdBy").notNull(),
     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updatedAt", { mode: "date" }).notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
     deletedAt: timestamp("deletedAt", { mode: "date" }),
   },
   (table) => ({
@@ -111,7 +112,7 @@ export const checklistItems = pgTable(
     noteId: text("noteId").notNull(),
     slackMessageId: text("slackMessageId"),
     createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updatedAt", { mode: "date" }).notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
   },
   (table) => ({
     noteIdIdx: index().on(table.noteId),
@@ -158,6 +159,16 @@ export const verificationTokens = pgTable(
     identifierTokenIdx: unique().on(table.identifier, table.token),
   })
 );
+
+// Better Auth verification table
+export const verification = pgTable("verification", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  value: text("value").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
 
 // Relations
 export const accountsRelations = relations(accounts, ({ one }) => ({

@@ -8,6 +8,27 @@
       "when": 1755094042157,
       "tag": "0000_dizzy_jackpot",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1755106299634,
+      "tag": "0001_romantic_archangel",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1755113797844,
+      "tag": "0002_amused_silver_sable",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1755114309804,
+      "tag": "0003_wise_rhodey",
+      "breakpoints": true
     }
   ]
 }
