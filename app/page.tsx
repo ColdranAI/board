@@ -110,16 +110,16 @@ export default async function HomePage() {
         <div className="container mx-auto text-center text-sm text-slate-600 dark:text-zinc-400">
           A project by{" "}
           <Link
-            href="https://antiwork.com"
+            href="https://coldran.com"
             className="underline hover:text-slate-900 dark:hover:text-zinc-100"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Antiwork
+            Coldran
           </Link>
           {" • "}
           <Link
-            href="https://github.com/antiwork/Coldboard"
+            href="https://github.com/coldran/Coldboard"
             className="underline hover:text-slate-900 dark:hover:text-zinc-100"
             target="_blank"
             rel="noopener noreferrer"

@@ -19,7 +19,7 @@ export function register() {
     },
 
     attributes: {
-      "service.namespace": "antiwork",
+      "service.namespace": "coldran",
       "service.version": process.env.npm_package_version,
       "deployment.environment": process.env.NODE_ENV,
     },

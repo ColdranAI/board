@@ -45,12 +45,9 @@ npm run dev
 
 Visit [http://localhost:3000](http://localhost:3000) in your browser to access the application.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/antiwork/Coldboard&env=DATABASE_URL,EMAIL_FROM,AUTH_RESEND_KEY,AUTH_SECRET)
 
 ## Database Commands
 
-- `npm run docker:up` - Start PostgreSQL database
-- `npm run docker:down` - Stop PostgreSQL database
 - `npm run db:generate` - Generate Prisma client
 - `npm run db:push` - Push schema changes to database
 - `npm run db:migrate` - Run database migrations
