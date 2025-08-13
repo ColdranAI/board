@@ -3,6 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { users, sessions, organizationInvites, organizations } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 async function acceptInvite(token: string) {
   "use server";
@@ -13,10 +15,31 @@ async function acceptInvite(token: string) {
   }
 
   // Find the invite by token (ID)
-  const invite = await db.organizationInvite.findUnique({
-    where: { id: token },
-    include: { organization: true },
-  });
+  const inviteResult = await db
+    .select({
+      id: organizationInvites.id,
+      email: organizationInvites.email,
+      organizationId: organizationInvites.organizationId,
+      invitedBy: organizationInvites.invitedBy,
+      createdAt: organizationInvites.createdAt,
+      status: organizationInvites.status,
+      organization: {
+        id: organizations.id,
+        name: organizations.name,
+      },
+      user: {
+        id: users.id,
+        name: users.name,
+        email: users.email,
+      },
+    })
+    .from(organizationInvites)
+    .leftJoin(organizations, eq(organizationInvites.organizationId, organizations.id))
+    .leftJoin(users, eq(organizationInvites.invitedBy, users.id))
+    .where(eq(organizationInvites.id, token))
+    .limit(1);
+
+  const invite = inviteResult[0];
 
   if (!invite) {
     throw new Error("Invalid or expired invitation");
@@ -31,16 +54,16 @@ async function acceptInvite(token: string) {
   }
 
   // Update user to join the organization
-  await db.user.update({
-    where: { id: session.user.id },
-    data: { organizationId: invite.organizationId },
-  });
+  await db
+    .update(users)
+    .set({ organizationId: invite.organizationId })
+    .where(eq(users.id, session.user!.id!));
 
   // Mark invite as accepted
-  await db.organizationInvite.update({
-    where: { id: token },
-    data: { status: "ACCEPTED" },
-  });
+  await db
+    .update(organizationInvites)
+    .set({ status: "ACCEPTED" })
+    .where(eq(organizationInvites.id, token));
 
   redirect("/dashboard");
 }
@@ -54,9 +77,20 @@ async function declineInvite(token: string) {
   }
 
   // Find the invite by token (ID)
-  const invite = await db.organizationInvite.findUnique({
-    where: { id: token },
-  });
+  const inviteResult = await db
+    .select({
+      id: organizationInvites.id,
+      email: organizationInvites.email,
+      organizationId: organizationInvites.organizationId,
+      invitedBy: organizationInvites.invitedBy,
+      createdAt: organizationInvites.createdAt,
+      status: organizationInvites.status,
+    })
+    .from(organizationInvites)
+    .where(eq(organizationInvites.id, token))
+    .limit(1);
+
+  const invite = inviteResult[0];
 
   if (!invite) {
     throw new Error("Invalid or expired invitation");
@@ -67,10 +101,10 @@ async function declineInvite(token: string) {
   }
 
   // Mark invite as declined
-  await db.organizationInvite.update({
-    where: { id: token },
-    data: { status: "DECLINED" },
-  });
+  await db
+    .update(organizationInvites)
+    .set({ status: "DECLINED" })
+    .where(eq(organizationInvites.id, token));
 
   redirect("/dashboard");
 }
@@ -80,37 +114,61 @@ async function autoVerifyAndCreateSession(email: string, token: string) {
 
   try {
     // Check if user already exists
-    let user = await db.user.findUnique({
-      where: { email },
-    });
+    let userResult = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        emailVerified: users.emailVerified,
+        image: users.image,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+        organizationId: users.organizationId,
+        isAdmin: users.isAdmin,
+      })
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+
+    let user = userResult[0];
 
     // If user doesn't exist, create one with verified email
     if (!user) {
-      user = await db.user.create({
-        data: {
+      const newUserResult = await db
+        .insert(users)
+        .values({
+          id: crypto.randomUUID(),
           email,
           emailVerified: new Date(), // Auto-verify since they clicked the invite link
-        },
-      });
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
+      
+      user = newUserResult[0];
     } else if (!user.emailVerified) {
       // If user exists but isn't verified, verify them
-      user = await db.user.update({
-        where: { id: user.id },
-        data: { emailVerified: new Date() },
-      });
+      const updatedUserResult = await db
+        .update(users)
+        .set({ emailVerified: new Date() })
+        .where(eq(users.id, user.id))
+        .returning();
+      
+      user = updatedUserResult[0];
     }
 
     // Create a session for the user
     const sessionToken = crypto.randomUUID();
     const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
 
-    await db.session.create({
-      data: {
+    await db
+      .insert(sessions)
+      .values({
+        id: crypto.randomUUID(),
         sessionToken,
         userId: user.id,
         expires,
-      },
-    });
+      });
 
     // Redirect to a special endpoint that will set the session cookie and redirect back
     redirect(
@@ -158,13 +216,31 @@ export default async function InviteAcceptPage({ searchParams }: InviteAcceptPag
   }
 
   // Find the invite by token
-  const invite = await db.organizationInvite.findUnique({
-    where: { id: token },
-    include: {
-      organization: true,
-      user: true, // The user who sent the invite
-    },
-  });
+  const inviteResult = await db
+    .select({
+      id: organizationInvites.id,
+      email: organizationInvites.email,
+      organizationId: organizationInvites.organizationId,
+      invitedBy: organizationInvites.invitedBy,
+      createdAt: organizationInvites.createdAt,
+      status: organizationInvites.status,
+      organization: {
+        id: organizations.id,
+        name: organizations.name,
+      },
+      user: {
+        id: users.id,
+        name: users.name,
+        email: users.email,
+      },
+    })
+    .from(organizationInvites)
+    .leftJoin(organizations, eq(organizationInvites.organizationId, organizations.id))
+    .leftJoin(users, eq(organizationInvites.invitedBy, users.id))
+    .where(eq(organizationInvites.id, token))
+    .limit(1);
+
+  const invite = inviteResult[0];
 
   if (!invite) {
     return (
@@ -199,12 +275,12 @@ export default async function InviteAcceptPage({ searchParams }: InviteAcceptPag
               <CardHeader className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <span className="text-2xl font-bold text-white">
-                    {invite.organization.name.charAt(0).toUpperCase()}
+                    {invite.organization?.name.charAt(0).toUpperCase()}
                   </span>
                 </div>
-                <CardTitle className="text-xl">{invite.organization.name}</CardTitle>
+                <CardTitle className="text-xl">{invite.organization?.name}</CardTitle>
                 <CardDescription className="text-base">
-                  {invite.user.name || invite.user.email} has invited you to join their organization
+                  {invite.user?.name || invite.user?.email} has invited you to join their organization
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -224,7 +300,7 @@ export default async function InviteAcceptPage({ searchParams }: InviteAcceptPag
   }
 
   // Check if the invite is for the current user's email
-  if (invite.email !== session.user.email) {
+  if (invite.email !== session.user?.email) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
         <div className="container mx-auto px-4 py-8">
@@ -303,12 +379,12 @@ export default async function InviteAcceptPage({ searchParams }: InviteAcceptPag
             <CardHeader className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-2xl font-bold text-white">
-                  {invite.organization.name.charAt(0).toUpperCase()}
+                  {invite.organization?.name.charAt(0).toUpperCase()}
                 </span>
               </div>
-              <CardTitle className="text-xl">{invite.organization.name}</CardTitle>
+              <CardTitle className="text-xl">{invite.organization?.name}</CardTitle>
               <CardDescription className="text-base">
-                {invite.user.name || invite.user.email} has invited you to join their organization
+                {invite.user?.name || invite.user?.email} has invited you to join their organization
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

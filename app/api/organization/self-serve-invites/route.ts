@@ -170,7 +170,6 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
-    const selfServeInvite = selfServeInviteResult[0];
 
     // Get the created invite with user info
     const inviteWithUserResult = await db

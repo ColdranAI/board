@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -247,110 +247,6 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
     }
   };
 
-  // Helper function to calculate bin-packed layout for desktop
-  const calculateGridLayout = () => {
-    if (typeof window === "undefined") return [];
-
-    const config = getResponsiveConfig();
-    const containerWidth = window.innerWidth - config.containerPadding * 2;
-    const noteWidthWithGap = config.noteWidth + config.gridGap;
-    const columnsCount = Math.floor((containerWidth + config.gridGap) / noteWidthWithGap);
-    const actualColumnsCount = Math.max(1, columnsCount);
-
-    // Calculate the actual available width and adjust note width to fill better
-    const availableWidthForNotes = containerWidth - (actualColumnsCount - 1) * config.gridGap;
-    const calculatedNoteWidth = Math.floor(availableWidthForNotes / actualColumnsCount);
-    // Ensure notes don't get too narrow or too wide based on screen size
-    const minWidth = config.noteWidth - 40;
-    const maxWidth = config.noteWidth + 80;
-    const adjustedNoteWidth = Math.max(minWidth, Math.min(maxWidth, calculatedNoteWidth));
-
-    // Use full width with minimal left offset
-    const offsetX = config.containerPadding;
-
-    // Bin-packing algorithm: track the bottom Y position of each column
-    const columnBottoms: number[] = new Array(actualColumnsCount).fill(config.containerPadding);
-
-    return filteredNotes.map((note) => {
-      const noteHeight = calculateNoteHeight(note, adjustedNoteWidth, config.notePadding);
-
-      // Find the column with the lowest bottom position
-      let bestColumn = 0;
-      let minBottom = columnBottoms[0];
-
-      for (let col = 1; col < actualColumnsCount; col++) {
-        if (columnBottoms[col] < minBottom) {
-          minBottom = columnBottoms[col];
-          bestColumn = col;
-        }
-      }
-
-      // Place the note in the best column
-      const x = offsetX + bestColumn * (adjustedNoteWidth + config.gridGap);
-      const y = columnBottoms[bestColumn];
-
-      // Update the column bottom position
-      columnBottoms[bestColumn] = y + noteHeight + config.gridGap;
-
-      return {
-        ...note,
-        x,
-        y,
-        width: adjustedNoteWidth,
-        height: noteHeight,
-      };
-    });
-  };
-
-  // Helper function to calculate mobile layout (optimized single/double column)
-  const calculateMobileLayout = () => {
-    if (typeof window === "undefined") return [];
-
-    const config = getResponsiveConfig();
-    const containerWidth = window.innerWidth - config.containerPadding * 2;
-    const minNoteWidth = config.noteWidth - 20; // Slightly smaller minimum for mobile
-    const columnsCount = Math.floor(
-      (containerWidth + config.gridGap) / (minNoteWidth + config.gridGap)
-    );
-    const actualColumnsCount = Math.max(1, columnsCount);
-
-    // Calculate note width for mobile
-    const availableWidthForNotes = containerWidth - (actualColumnsCount - 1) * config.gridGap;
-    const noteWidth = Math.floor(availableWidthForNotes / actualColumnsCount);
-
-    // Bin-packing for mobile with fewer columns
-    const columnBottoms: number[] = new Array(actualColumnsCount).fill(config.containerPadding);
-
-    return filteredNotes.map((note) => {
-      const noteHeight = calculateNoteHeight(note, noteWidth, config.notePadding);
-
-      // Find the column with the lowest bottom position
-      let bestColumn = 0;
-      let minBottom = columnBottoms[0];
-
-      for (let col = 1; col < actualColumnsCount; col++) {
-        if (columnBottoms[col] < minBottom) {
-          minBottom = columnBottoms[col];
-          bestColumn = col;
-        }
-      }
-
-      // Place the note in the best column
-      const x = config.containerPadding + bestColumn * (noteWidth + config.gridGap);
-      const y = columnBottoms[bestColumn];
-
-      // Update the column bottom position
-      columnBottoms[bestColumn] = y + noteHeight + config.gridGap;
-
-      return {
-        ...note,
-        x,
-        y,
-        width: noteWidth,
-        height: noteHeight,
-      };
-    });
-  };
 
   useEffect(() => {
     const initializeParams = async () => {
@@ -363,13 +259,8 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
   // Initialize filters from URL on mount
   useEffect(() => {
     initializeFiltersFromURL();
-  }, []);
+  }, [initializeFiltersFromURL, searchParams]);
 
-  useEffect(() => {
-    if (boardId) {
-      fetchBoardData();
-    }
-  }, [boardId]);
 
   // Close dropdowns when clicking outside and handle escape key
   useEffect(() => {
@@ -447,7 +338,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [searchTerm]);
+  }, [searchTerm, updateURL, debouncedSearchTerm, dateRange, selectedAuthor]);
 
   // Get unique authors from notes
   const getUniqueAuthors = (notes: Note[]) => {
@@ -543,6 +434,111 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
     () => filterAndSortNotes(notes, debouncedSearchTerm, dateRange, selectedAuthor, user),
     [notes, debouncedSearchTerm, dateRange, selectedAuthor, user]
   );
+  // Helper function to calculate bin-packed layout for desktop
+  const calculateGridLayout = useCallback(() => {
+    if (typeof window === "undefined") return [];
+
+    const config = getResponsiveConfig();
+    const containerWidth = window.innerWidth - config.containerPadding * 2;
+    const noteWidthWithGap = config.noteWidth + config.gridGap;
+    const columnsCount = Math.floor((containerWidth + config.gridGap) / noteWidthWithGap);
+    const actualColumnsCount = Math.max(1, columnsCount);
+
+    // Calculate the actual available width and adjust note width to fill better
+    const availableWidthForNotes = containerWidth - (actualColumnsCount - 1) * config.gridGap;
+    const calculatedNoteWidth = Math.floor(availableWidthForNotes / actualColumnsCount);
+    // Ensure notes don't get too narrow or too wide based on screen size
+    const minWidth = config.noteWidth - 40;
+    const maxWidth = config.noteWidth + 80;
+    const adjustedNoteWidth = Math.max(minWidth, Math.min(maxWidth, calculatedNoteWidth));
+
+    // Use full width with minimal left offset
+    const offsetX = config.containerPadding;
+
+    // Bin-packing algorithm: track the bottom Y position of each column
+    const columnBottoms: number[] = new Array(actualColumnsCount).fill(config.containerPadding);
+
+    return filteredNotes.map((note) => {
+      const noteHeight = calculateNoteHeight(note, adjustedNoteWidth, config.notePadding);
+
+      // Find the column with the lowest bottom position
+      let bestColumn = 0;
+      let minBottom = columnBottoms[0];
+
+      for (let col = 1; col < actualColumnsCount; col++) {
+        if (columnBottoms[col] < minBottom) {
+          minBottom = columnBottoms[col];
+          bestColumn = col;
+        }
+      }
+
+      // Place the note in the best column
+      const x = offsetX + bestColumn * (adjustedNoteWidth + config.gridGap);
+      const y = columnBottoms[bestColumn];
+
+      // Update the column bottom position
+      columnBottoms[bestColumn] = y + noteHeight + config.gridGap;
+
+      return {
+        ...note,
+        x,
+        y,
+        width: adjustedNoteWidth,
+        height: noteHeight,
+      };
+    });
+  }, [filteredNotes, getResponsiveConfig, calculateNoteHeight]);
+
+  // Helper function to calculate mobile layout (optimized single/double column)
+  const calculateMobileLayout = useCallback(() => {
+    if (typeof window === "undefined") return [];
+
+    const config = getResponsiveConfig();
+    const containerWidth = window.innerWidth - config.containerPadding * 2;
+    const minNoteWidth = config.noteWidth - 20; // Slightly smaller minimum for mobile
+    const columnsCount = Math.floor(
+      (containerWidth + config.gridGap) / (minNoteWidth + config.gridGap)
+    );
+    const actualColumnsCount = Math.max(1, columnsCount);
+
+    // Calculate note width for mobile
+    const availableWidthForNotes = containerWidth - (actualColumnsCount - 1) * config.gridGap;
+    const noteWidth = Math.floor(availableWidthForNotes / actualColumnsCount);
+
+    // Bin-packing for mobile with fewer columns
+    const columnBottoms: number[] = new Array(actualColumnsCount).fill(config.containerPadding);
+
+    return filteredNotes.map((note) => {
+      const noteHeight = calculateNoteHeight(note, noteWidth, config.notePadding);
+
+      // Find the column with the lowest bottom position
+      let bestColumn = 0;
+      let minBottom = columnBottoms[0];
+
+      for (let col = 1; col < actualColumnsCount; col++) {
+        if (columnBottoms[col] < minBottom) {
+          minBottom = columnBottoms[col];
+          bestColumn = col;
+        }
+      }
+
+      // Place the note in the best column
+      const x = config.containerPadding + bestColumn * (noteWidth + config.gridGap);
+      const y = columnBottoms[bestColumn];
+
+      // Update the column bottom position
+      columnBottoms[bestColumn] = y + noteHeight + config.gridGap;
+
+      return {
+        ...note,
+        x,
+        y,
+        width: noteWidth,
+        height: noteHeight,
+      };
+    });
+  }, [filteredNotes, getResponsiveConfig, calculateNoteHeight]);
+
   const layoutNotes = useMemo(
     () => (isMobile ? calculateMobileLayout() : calculateGridLayout()),
     [isMobile, calculateMobileLayout, calculateGridLayout]
@@ -640,6 +636,12 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (boardId) {
+      fetchBoardData();
+    }
+  }, [boardId, fetchBoardData]);
 
   // Adapter: bridge component Note -> existing update handler
   const handleUpdateNoteFromComponent = async (updatedNote: Note) => {

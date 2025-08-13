@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { eq, isNull, count, desc } from "drizzle-orm";
+import { eq, count, desc } from "drizzle-orm";
 import { users, boards, notes } from "@/lib/db/schema";
 
 export async function GET() {

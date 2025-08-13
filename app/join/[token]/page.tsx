@@ -66,7 +66,7 @@ async function joinOrganization(token: string) {
     })
     .from(users)
     .leftJoin(organizations, eq(users.organizationId, organizations.id))
-    .where(eq(users.id, session.user.id))
+    .where(eq(users.id, session.user!.id!))
     .limit(1);
 
   const user = userResult[0];
@@ -88,7 +88,7 @@ async function joinOrganization(token: string) {
       organizationId: invite.organizationId,
       updatedAt: new Date(),
     })
-    .where(eq(users.id, session.user.id));
+    .where(eq(users.id, session.user!.id!));
 
   // Increment usage count
   await db
@@ -383,10 +383,10 @@ export default async function JoinPage({ params }: JoinPageProps) {
             {/* Header */}
             <div className="text-center">
               <h1 className="text-3xl font-bold mb-2">
-                Join {invite.organization.name} on Coldboard!
+                Join {invite.organization?.name} on Coldboard!
               </h1>
               <p className="text-muted-foreground">
-                You&apos;ve been invited to join {invite.organization.name}
+                You&apos;ve been invited to join {invite.organization?.name}
               </p>
             </div>
 
@@ -395,10 +395,10 @@ export default async function JoinPage({ params }: JoinPageProps) {
               <CardHeader className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <span className="text-2xl font-bold text-white">
-                    {invite.organization.name.charAt(0).toUpperCase()}
+                    {invite.organization?.name.charAt(0).toUpperCase()}
                   </span>
                 </div>
-                <CardTitle className="text-xl">{invite.organization.name}</CardTitle>
+                <CardTitle className="text-xl">{invite.organization?.name}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-center space-y-2">
@@ -430,7 +430,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
                     />
                   </div>
                   <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
-                    Join {invite.organization.name}
+                    Join {invite.organization?.name}
                   </Button>
                 </form>
 
@@ -465,7 +465,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
     })
     .from(users)
     .leftJoin(organizations, eq(users.organizationId, organizations.id))
-    .where(eq(users.id, session.user.id))
+    .where(eq(users.id, session.user!.id!))
     .limit(1);
 
   const user = userResult[0];
@@ -479,7 +479,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
               <CardHeader className="text-center">
                 <CardTitle className="text-xl text-blue-600">Already a Member</CardTitle>
                 <CardDescription>
-                  You are already a member of {invite.organization.name}.
+                  You are already a member of {invite.organization?.name}.
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-4">
@@ -535,16 +535,16 @@ export default async function JoinPage({ params }: JoinPageProps) {
             <CardHeader className="text-center">
               <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-2xl font-bold text-white">
-                  {invite.organization.name.charAt(0).toUpperCase()}
+                  {invite.organization?.name.charAt(0).toUpperCase()}
                 </span>
               </div>
-              <CardTitle className="text-xl">{invite.organization.name}</CardTitle>
+              <CardTitle className="text-xl">{invite.organization?.name}</CardTitle>
               <CardDescription className="text-base">{invite.name}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="text-center space-y-2">
                 <p className="text-sm text-muted-foreground">
-                  Created by: {invite.user.name || invite.user.email}
+                  Created by: {invite.user?.name || invite.user?.email}
                 </p>
                 <p className="text-sm text-muted-foreground">{usageInfo}</p>
                 {invite.expiresAt && (
@@ -557,7 +557,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
               <div className="flex flex-col space-y-3">
                 <form action={joinOrganization.bind(null, token)}>
                   <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
-                    Join {invite.organization.name}
+                    Join {invite.organization?.name}
                   </Button>
                 </form>
               </div>

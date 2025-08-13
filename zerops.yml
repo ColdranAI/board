@@ -2,19 +2,23 @@ zerops:
   - setup: app
     build:
       base: nodejs@22
+      envVariables:
+        DATABASE_URL: ${RUNTIME_DATABASE_URL}
+        AUTH_RESEND_KEY: ${RUNTIME_AUTH_RESEND_KEY}
       buildCommands:
         - pnpm i
         - pnpm run build
-        - pnpm run db:push
-      
       cache:
       - pnpm-lock.yaml
       - node_modules
-
       deployFiles: ./
-
     run:
       base: nodejs@22
+      initCommands:
+        - pnpm run db:generate
+        - pnpm run db:push
+      envVariables:
+        DATABASE_URL: ${db_connectionTlsString}
       ports:
         - port: 3000
           httpSupport: true

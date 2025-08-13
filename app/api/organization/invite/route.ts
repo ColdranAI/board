@@ -6,7 +6,7 @@ import { Resend } from "resend";
 import { eq, and } from "drizzle-orm";
 import { users, organizations, organizationInvites } from "@/lib/db/schema";
 
-const resend = new Resend(env.AUTH_RESEND_KEY);
+const resend = new Resend(process.env.AUTH_RESEND_KEY);
 
 export async function POST(request: NextRequest) {
   try {

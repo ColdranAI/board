@@ -214,95 +214,6 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
     }
   }, [boardId, router]);
 
-  const calculateGridLayout = useCallback(() => {
-    if (typeof window === "undefined") return [];
-
-    const config = getResponsiveConfig();
-    const containerWidth = window.innerWidth - config.containerPadding * 2;
-    const noteWidthWithGap = config.noteWidth + config.gridGap;
-    const columnsCount = Math.floor((containerWidth + config.gridGap) / noteWidthWithGap);
-    const actualColumnsCount = Math.max(1, columnsCount);
-
-    const availableWidthForNotes = containerWidth - (actualColumnsCount - 1) * config.gridGap;
-    const calculatedNoteWidth = Math.floor(availableWidthForNotes / actualColumnsCount);
-    const minWidth = config.noteWidth - 40;
-    const maxWidth = config.noteWidth + 80;
-    const adjustedNoteWidth = Math.max(minWidth, Math.min(maxWidth, calculatedNoteWidth));
-
-    const offsetX = config.containerPadding;
-    const columnBottoms: number[] = new Array(actualColumnsCount).fill(config.containerPadding);
-
-    return filteredNotes.map((note) => {
-      const noteHeight = calculateNoteHeight(note, adjustedNoteWidth, config.notePadding);
-
-      let bestColumn = 0;
-      let minBottom = columnBottoms[0];
-
-      for (let col = 1; col < actualColumnsCount; col++) {
-        if (columnBottoms[col] < minBottom) {
-          minBottom = columnBottoms[col];
-          bestColumn = col;
-        }
-      }
-
-      const x = offsetX + bestColumn * (adjustedNoteWidth + config.gridGap);
-      const y = columnBottoms[bestColumn];
-
-      columnBottoms[bestColumn] = y + noteHeight + config.gridGap;
-
-      return {
-        ...note,
-        x,
-        y,
-        width: adjustedNoteWidth,
-        height: noteHeight,
-      };
-    });
-  }, [filteredNotes]);
-
-  const calculateMobileLayout = useCallback(() => {
-    if (typeof window === "undefined") return [];
-
-    const config = getResponsiveConfig();
-    const containerWidth = window.innerWidth - config.containerPadding * 2;
-    const minNoteWidth = config.noteWidth - 20;
-    const columnsCount = Math.floor(
-      (containerWidth + config.gridGap) / (minNoteWidth + config.gridGap)
-    );
-    const actualColumnsCount = Math.max(1, columnsCount);
-
-    const availableWidthForNotes = containerWidth - (actualColumnsCount - 1) * config.gridGap;
-    const noteWidth = Math.floor(availableWidthForNotes / actualColumnsCount);
-
-    const columnBottoms: number[] = new Array(actualColumnsCount).fill(config.containerPadding);
-
-    return filteredNotes.map((note) => {
-      const noteHeight = calculateNoteHeight(note, noteWidth, config.notePadding);
-
-      let bestColumn = 0;
-      let minBottom = columnBottoms[0];
-
-      for (let col = 1; col < actualColumnsCount; col++) {
-        if (columnBottoms[col] < minBottom) {
-          minBottom = columnBottoms[col];
-          bestColumn = col;
-        }
-      }
-
-      const x = config.containerPadding + bestColumn * (noteWidth + config.gridGap);
-      const y = columnBottoms[bestColumn];
-
-      columnBottoms[bestColumn] = y + noteHeight + config.gridGap;
-
-      return {
-        ...note,
-        x,
-        y,
-        width: noteWidth,
-        height: noteHeight,
-      };
-    });
-  }, [filteredNotes]);
 
   useEffect(() => {
     const initializeParams = async () => {
@@ -347,6 +258,96 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
     () => filterAndSortNotes(notes, searchTerm, dateRange, selectedAuthor),
     [notes, searchTerm, dateRange, selectedAuthor]
   );
+
+  const calculateGridLayout = useCallback(() => {
+    if (typeof window === "undefined") return [];
+
+    const config = getResponsiveConfig();
+    const containerWidth = window.innerWidth - config.containerPadding * 2;
+    const noteWidthWithGap = config.noteWidth + config.gridGap;
+    const columnsCount = Math.floor((containerWidth + config.gridGap) / noteWidthWithGap);
+    const actualColumnsCount = Math.max(1, columnsCount);
+
+    const availableWidthForNotes = containerWidth - (actualColumnsCount - 1) * config.gridGap;
+    const calculatedNoteWidth = Math.floor(availableWidthForNotes / actualColumnsCount);
+    const minWidth = config.noteWidth - 40;
+    const maxWidth = config.noteWidth + 80;
+    const adjustedNoteWidth = Math.max(minWidth, Math.min(maxWidth, calculatedNoteWidth));
+
+    const offsetX = config.containerPadding;
+    const columnBottoms: number[] = new Array(actualColumnsCount).fill(config.containerPadding);
+
+    return filteredNotes.map((note) => {
+      const noteHeight = calculateNoteHeight(note, adjustedNoteWidth, config.notePadding);
+
+      let bestColumn = 0;
+      let minBottom = columnBottoms[0];
+
+      for (let col = 1; col < actualColumnsCount; col++) {
+        if (columnBottoms[col] < minBottom) {
+          minBottom = columnBottoms[col];
+          bestColumn = col;
+        }
+      }
+
+      const x = offsetX + bestColumn * (adjustedNoteWidth + config.gridGap);
+      const y = columnBottoms[bestColumn];
+
+      columnBottoms[bestColumn] = y + noteHeight + config.gridGap;
+
+      return {
+        ...note,
+        x,
+        y,
+        width: adjustedNoteWidth,
+        height: noteHeight,
+      };
+    });
+  }, [filteredNotes, calculateNoteHeight, getResponsiveConfig]);
+
+  const calculateMobileLayout = useCallback(() => {
+    if (typeof window === "undefined") return [];
+
+    const config = getResponsiveConfig();
+    const containerWidth = window.innerWidth - config.containerPadding * 2;
+    const minNoteWidth = config.noteWidth - 20;
+    const columnsCount = Math.floor(
+      (containerWidth + config.gridGap) / (minNoteWidth + config.gridGap)
+    );
+    const actualColumnsCount = Math.max(1, columnsCount);
+
+    const availableWidthForNotes = containerWidth - (actualColumnsCount - 1) * config.gridGap;
+    const noteWidth = Math.floor(availableWidthForNotes / actualColumnsCount);
+
+    const columnBottoms: number[] = new Array(actualColumnsCount).fill(config.containerPadding);
+
+    return filteredNotes.map((note) => {
+      const noteHeight = calculateNoteHeight(note, noteWidth, config.notePadding);
+
+      let bestColumn = 0;
+      let minBottom = columnBottoms[0];
+
+      for (let col = 1; col < actualColumnsCount; col++) {
+        if (columnBottoms[col] < minBottom) {
+          minBottom = columnBottoms[col];
+          bestColumn = col;
+        }
+      }
+
+      const x = config.containerPadding + bestColumn * (noteWidth + config.gridGap);
+      const y = columnBottoms[bestColumn];
+
+      columnBottoms[bestColumn] = y + noteHeight + config.gridGap;
+
+      return {
+        ...note,
+        x,
+        y,
+        width: noteWidth,
+        height: noteHeight,
+      };
+    });
+  }, [filteredNotes, calculateNoteHeight, getResponsiveConfig]);
 
   const layoutNotes = useMemo(
     () => (isMobile ? calculateMobileLayout() : calculateGridLayout()),

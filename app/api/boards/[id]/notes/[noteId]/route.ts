@@ -140,7 +140,16 @@ export async function PUT(
     }
 
     // Update note
-    const updateData: any = {};
+    interface ChecklistItemInput {
+      text: string;
+      completed?: boolean;
+    }
+
+    const updateData: Partial<{
+      content: string;
+      color: string;
+      archivedAt: Date | null;
+    }> = {};
     if (content !== undefined) updateData.content = content;
     if (color !== undefined) updateData.color = color;
     if (archivedAt !== undefined) updateData.archivedAt = archivedAt;
@@ -162,7 +171,7 @@ export async function PUT(
         await db
           .insert(checklistItems)
           .values(
-            checklistData.map((item: any, index: number) => ({
+            checklistData.map((item: ChecklistItemInput, index: number) => ({
               id: crypto.randomUUID(),
               noteId,
               text: item.text,

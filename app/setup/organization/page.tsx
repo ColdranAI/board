@@ -9,15 +9,16 @@ import { Resend } from "resend";
 import OrganizationSetupForm from "./form";
 import { env } from "@/lib/env";
 
-const resend = new Resend(env.AUTH_RESEND_KEY);
+const resend = new Resend(process.env.AUTH_RESEND_KEY);
 
 async function createOrganization(orgName: string, teamEmails: string[]) {
   "use server";
 
   const session = await auth();
+
   if (!session?.user?.id) {
-    throw new Error("Not authenticated");
-  }
+  redirect("/auth/signin");
+}
 
   if (!orgName?.trim()) {
     throw new Error("Organization name is required");
@@ -110,7 +111,7 @@ export default async function OrganizationSetup() {
     })
     .from(users)
     .leftJoin(organizations, eq(users.organizationId, organizations.id))
-    .where(eq(users.id, session.user.id))
+    .where(eq(users.id, String(session.user.id)))
     .limit(1);
 
   const user = userResult[0];

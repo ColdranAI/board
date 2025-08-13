@@ -12,22 +12,20 @@ async function updateUserName(formData: FormData) {
   "use server";
 
   const session = await auth();
-  if (!session?.user?.id) {
+  const userId = session?.user?.id;
+  if (!userId) {
     throw new Error("Not authenticated");
   }
 
-  const name = formData.get("name") as string;
-  if (!name?.trim()) {
+  const name = (formData.get("name") as string)?.trim();
+  if (!name) {
     throw new Error("Name is required");
   }
 
   await db
     .update(users)
-    .set({
-      name: name.trim(),
-      updatedAt: new Date(),
-    })
-    .where(eq(users.id, session.user.id));
+    .set({ name, updatedAt: new Date() })
+    .where(eq(users.id, userId)); // <-- value side is a string, not a column
 
   // Check if user has organization, redirect accordingly
   const userResult = await db
@@ -41,7 +39,7 @@ async function updateUserName(formData: FormData) {
     })
     .from(users)
     .leftJoin(organizations, eq(users.organizationId, organizations.id))
-    .where(eq(users.id, session.user.id))
+    .where(eq(users.id, userId)) // <-- same fix here
     .limit(1);
 
   const user = userResult[0];
@@ -53,10 +51,12 @@ async function updateUserName(formData: FormData) {
   }
 }
 
+
 export default async function ProfileSetup() {
   const session = await auth();
+  const userId = session?.user?.id;
 
-  if (!session?.user) {
+  if (!session?.user || !userId) {
     redirect("/auth/signin");
   }
 
@@ -73,7 +73,7 @@ export default async function ProfileSetup() {
       })
       .from(users)
       .leftJoin(organizations, eq(users.organizationId, organizations.id))
-      .where(eq(users.id, session.user.id))
+      .where(eq(users.id, userId)) // <-- fixed
       .limit(1);
 
     const user = userResult[0];
@@ -84,6 +84,7 @@ export default async function ProfileSetup() {
       redirect("/dashboard");
     }
   }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
