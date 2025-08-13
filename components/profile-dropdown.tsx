@@ -1,4 +1,4 @@
-import { signOut } from "next-auth/react";
+import { signOut } from "@/lib/auth-client";
 import Link from "next/link";
 import { LogOut, Settings } from "lucide-react";
 

@@ -15,7 +15,7 @@ test.describe("GitHub Authentication Flow", () => {
   test("should initiate GitHub OAuth flow when button is clicked", async ({ page }) => {
     let githubAuthInitiated = false;
 
-    // Mock the GitHub OAuth redirect URL that NextAuth generates
+    // Mock the GitHub OAuth redirect URL that Better Auth generates
     await page.route("**/github.com/login/oauth/authorize**", async (route) => {
       githubAuthInitiated = true;
 

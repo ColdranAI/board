@@ -1,44 +1,29 @@
-import NextAuth from "next-auth";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import Resend from "next-auth/providers/resend";
-import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import Resend from "better-auth/providers/resend";
+import Google from "better-auth/providers/google";
+import GitHub from "better-auth/providers/github";
+
 import { db as drizzle } from "@/lib/db";
 import { env } from "@/lib/env";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: DrizzleAdapter(drizzle),
+export const betterAuthInstance = betterAuth({
+  baseURL: env.AUTH_URL,
+  secret: env.AUTH_SECRET,
+  adapter: drizzleAdapter(drizzle),
   providers: [
-    Resend({
-      from: env.EMAIL_FROM,
-    }),
-    GoogleProvider({
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    Resend({ apiKey: env.AUTH_RESEND_KEY, from: env.EMAIL_FROM }),
+    Google({
+      clientId: env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: env.GOOGLE_CLIENT_SECRET ?? "",
       allowDangerousEmailAccountLinking: true,
     }),
-    GitHubProvider({
-      clientId: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET,
+    GitHub({
+      clientId: env.GITHUB_CLIENT_ID ?? "",
+      clientSecret: env.GITHUB_CLIENT_SECRET ?? "",
       allowDangerousEmailAccountLinking: true,
     }),
   ],
-  pages: {
-    signIn: "/auth/signin",
-    verifyRequest: "/auth/verify-request",
-    error: "/auth/error",
-  },
-  callbacks: {
-    async signIn() {
-      return true;
-    },
-    async redirect({ url, baseUrl }) {
-      if (url.includes("/invite/accept")) {
-        return url.startsWith("/") ? `${baseUrl}${url}` : url;
-      }
-      if (url.startsWith("/")) return `${baseUrl}/dashboard`;
-      else if (new URL(url).origin === baseUrl) return url;
-      return `${baseUrl}/dashboard`;
-    },
-  },
 });
+
+export const { handlers, auth, signIn, signOut } = betterAuthInstance;

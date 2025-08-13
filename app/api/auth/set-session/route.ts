@@ -37,8 +37,8 @@ export async function GET(request: NextRequest) {
     // Create response with redirect
     const response = NextResponse.redirect(new URL(redirectTo, request.url));
 
-    // Set the NextAuth session cookie
-    response.cookies.set("authjs.session-token", sessionToken, {
+    // Set the Better Auth session cookie
+    response.cookies.set("better-auth.session-token", sessionToken, {
       expires: session[0].expires,
       httpOnly: true,
       secure: env.NODE_ENV === "production",
