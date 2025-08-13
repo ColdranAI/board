@@ -14,7 +14,7 @@ services:
     enableSubdomainAccess: true
     envSecrets:
       DATABASE_URL: postgresql://${db_user}:${db_password}@${db_hostname}:${db_port}/${db_dbName}
-      AUTH_URL: https://board.coldran.com
+      NEXT_PUBLIC_BETTER_AUTH_URL: https://board.coldran.com
       AUTH_SECRET: <@generateRandomString(<32>)>
       AUTH_RESEND_KEY:
       EMAIL_FROM: board@coldran.com

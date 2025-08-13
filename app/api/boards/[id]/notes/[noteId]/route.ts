@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { db } from "@/lib/db";
+import { headers } from "next/headers";import { db } from "@/lib/db";
 import { eq, and, isNull } from "drizzle-orm";
 import { notes, users, boards, checklistItems } from "@/lib/db/schema";
 
@@ -10,7 +10,7 @@ export async function GET(
 ) {
   try {
     const { id: boardId, noteId } = await params;
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: await headers() });
 
     // Get the note with user and board info
     const note = await db
@@ -92,7 +92,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string; noteId: string }> }
 ) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -229,7 +229,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string; noteId: string }> }
 ) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

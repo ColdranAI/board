@@ -1,4 +1,9 @@
+<<<<<<< Updated upstream
 import { signOut } from "next-auth/react";
+=======
+import { authClient } from "@/lib/auth-client";
+const { signOut } = authClient;
+>>>>>>> Stashed changes
 import Link from "next/link";
 import { LogOut, Settings } from "lucide-react";
 

@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { db } from "@/lib/db";
+import { headers } from "next/headers";import { db } from "@/lib/db";
 import { env } from "@/lib/env";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
@@ -10,7 +10,7 @@ const resend = new Resend(process.env.AUTH_RESEND_KEY);
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: await headers() });
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
             <h2>You're invited to join ${user[0].organization.name}!</h2>
             <p>${session.user.name} (${session.user.email}) has invited you to join their organization on Coldboard.</p>
             <p>Click the link below to accept the invitation:</p>
-            <a href="${env.AUTH_URL}/invite/accept?token=${invite[0].id}" 
+            <a href="${env.NEXT_PUBLIC_BETTER_AUTH_URL}/invite/accept?token=${invite[0].id}" 
                style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
               Accept Invitation
             </a>

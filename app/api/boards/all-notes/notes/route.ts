@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { db } from "@/lib/db";
+import { headers } from "next/headers";import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { eq, and, isNull, desc } from "drizzle-orm";
 import { users, notes, boards, checklistItems } from "@/lib/db/schema";
@@ -7,7 +7,7 @@ import { NOTE_COLORS } from "@/lib/constants";
 
 export async function GET() {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -78,7 +78,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

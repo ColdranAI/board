@@ -9,7 +9,7 @@ interface Env {
   GOOGLE_CLIENT_SECRET?: string;
   GITHUB_CLIENT_ID?: string;
   GITHUB_CLIENT_SECRET?: string;
-  AUTH_URL: string;
+  NEXT_PUBLIC_BETTER_AUTH_URL: string;
   AUTH_SECRET: string;
 }
 
@@ -22,6 +22,6 @@ export const env: Env = {
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
-  AUTH_URL: process.env.AUTH_URL!,
+  NEXT_PUBLIC_BETTER_AUTH_URL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL!,
   AUTH_SECRET: process.env.AUTH_SECRET!,
 };

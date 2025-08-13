@@ -1,12 +1,12 @@
 import { auth } from "@/auth";
-import { db } from "@/lib/db";
+import { headers } from "next/headers";import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { boards, organizations, users } from "@/lib/db/schema";
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: await headers() });
     const boardId = (await params).id;
 
     const board = await db
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: await headers() });
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -212,7 +212,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: await headers() });
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
