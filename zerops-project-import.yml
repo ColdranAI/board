@@ -10,7 +10,7 @@ services:
 
   - hostname: app
     type: nodejs@22
-    buildFromGit: https://github.com/zeropsio/recipe-rag-starter
+    buildFromGit: https://github.com/coldranai/board
     enableSubdomainAccess: true
     envSecrets:
       DATABASE_URL: postgresql://${db_user}:${db_password}@${db_hostname}:${db_port}/${db_dbName}
