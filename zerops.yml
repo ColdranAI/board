@@ -15,8 +15,7 @@ zerops:
     run:
       base: nodejs@22
       initCommands:
-        - pnpm run db:generate
-        - pnpm run db:push
+        - pnpm run db:migrate
       envVariables:
         DATABASE_URL: ${db_connectionTlsString}
       ports:
