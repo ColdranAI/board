@@ -1,16 +1,15 @@
-import { test as base, expect } from "@playwright/test";
-import { PrismaClient } from "@prisma/client";
+import { test as base } from "@playwright/test";
+import { db } from "@/lib/db";
 
-interface TestFixtures {
-  prisma: PrismaClient;
-}
+type TestFixtures = {
+  db: typeof db;
+};
 
 export const test = base.extend<TestFixtures>({
-  prisma: async ({}, use: (r: PrismaClient) => Promise<void>) => {
-    const prisma = new PrismaClient();
-    await use(prisma);
-    await prisma.$disconnect();
+  db: async ({}, use) => {
+    await use(db);
+    // Cleanup if needed
   },
 });
 
-export { expect };
+export { expect } from "@playwright/test";

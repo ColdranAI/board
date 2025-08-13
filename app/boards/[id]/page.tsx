@@ -363,14 +363,12 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
   // Initialize filters from URL on mount
   useEffect(() => {
     initializeFiltersFromURL();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (boardId) {
       fetchBoardData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardId]);
 
   // Close dropdowns when clicking outside and handle escape key

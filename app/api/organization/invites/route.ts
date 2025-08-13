@@ -1,33 +1,32 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
+import { users, organizationInvites } from "@/lib/db/schema";
 
 export async function GET() {
   try {
     const session = await auth();
-
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get user with organization
-    const user = await db.user.findUnique({
-      where: { id: session.user.id },
-      include: { organization: true },
-    });
+    // Get user's organization
+    const user = await db
+      .select({ organizationId: users.organizationId })
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1);
 
-    if (!user?.organizationId) {
+    if (!user[0]?.organizationId) {
       return NextResponse.json({ error: "No organization found" }, { status: 404 });
     }
 
-    // Get pending invites for this organization
-    const invites = await db.organizationInvite.findMany({
-      where: {
-        organizationId: user.organizationId,
-        status: "PENDING",
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    // Get all invites for the organization
+    const invites = await db
+      .select()
+      .from(organizationInvites)
+      .where(eq(organizationInvites.organizationId, user[0].organizationId));
 
     return NextResponse.json({ invites });
   } catch (error) {

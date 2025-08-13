@@ -1,16 +1,92 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import {
-  updateSlackMessage,
-  formatNoteForSlack,
-  sendSlackMessage,
-  sendTodoNotification,
-  hasValidContent,
-  shouldSendNotification,
-} from "@/lib/slack";
+import { eq, and, isNull } from "drizzle-orm";
+import { notes, users, boards, checklistItems } from "@/lib/db/schema";
 
-// Update a note
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string; noteId: string }> }
+) {
+  try {
+    const { id: boardId, noteId } = await params;
+    const session = await auth();
+
+    // Get the note with user and board info
+    const note = await db
+      .select({
+        id: notes.id,
+        content: notes.content,
+        color: notes.color,
+        boardId: notes.boardId,
+        createdBy: notes.createdBy,
+        createdAt: notes.createdAt,
+        updatedAt: notes.updatedAt,
+        archivedAt: notes.archivedAt,
+        deletedAt: notes.deletedAt,
+        user: {
+          id: users.id,
+          name: users.name,
+          email: users.email,
+        },
+        board: {
+          id: boards.id,
+          isPublic: boards.isPublic,
+          organizationId: boards.organizationId,
+        },
+      })
+      .from(notes)
+      .innerJoin(users, eq(notes.createdBy, users.id))
+      .innerJoin(boards, eq(notes.boardId, boards.id))
+      .where(
+        and(
+          eq(notes.id, noteId),
+          eq(notes.boardId, boardId),
+          isNull(notes.deletedAt)
+        )
+      )
+      .limit(1);
+
+    if (!note[0]) {
+      return NextResponse.json({ error: "Note not found" }, { status: 404 });
+    }
+
+    // Check access permissions
+    if (!note[0].board.isPublic) {
+      if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+
+      const user = await db
+        .select({ organizationId: users.organizationId })
+        .from(users)
+        .where(eq(users.id, session.user.id))
+        .limit(1);
+
+      if (!user[0]?.organizationId || note[0].board.organizationId !== user[0].organizationId) {
+        return NextResponse.json({ error: "Access denied" }, { status: 403 });
+      }
+    }
+
+    // Get checklist items
+    const noteChecklistItems = await db
+      .select()
+      .from(checklistItems)
+      .where(eq(checklistItems.noteId, noteId))
+      .orderBy(checklistItems.order);
+
+    const noteWithChecklists = {
+      ...note[0],
+      checklistItems: noteChecklistItems,
+    };
+
+    return NextResponse.json({ note: noteWithChecklists });
+  } catch (error) {
+    console.error("Error fetching note:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; noteId: string }> }
@@ -21,273 +97,124 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { content, color, archivedAt, checklistItems } = await request.json();
     const { id: boardId, noteId } = await params;
+    const { content, color, archivedAt, checklistItems: checklistData } = await request.json();
 
-    // Verify user has access to this board (same organization)
-    const user = await db.user.findUnique({
-      where: { id: session.user.id },
-      include: {
-        organization: {
-          select: {
-            id: true,
-            name: true,
-            slackWebhookUrl: true,
-          },
-        },
-      },
-    });
+    // Verify user has access to this note
+    const user = await db
+      .select({ organizationId: users.organizationId })
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1);
 
-    if (!user?.organizationId) {
+    if (!user[0]?.organizationId) {
       return NextResponse.json({ error: "No organization found" }, { status: 403 });
     }
 
-    const note = await db.note.findUnique({
-      where: { id: noteId },
-      include: {
-        board: true,
-        user: { select: { id: true, name: true, email: true } },
-        checklistItems: { orderBy: { order: "asc" } },
-      },
-    });
+    // Check note exists and user has access
+    const noteWithBoard = await db
+      .select({
+        id: notes.id,
+        boardId: notes.boardId,
+        board: {
+          organizationId: boards.organizationId,
+        },
+      })
+      .from(notes)
+      .innerJoin(boards, eq(notes.boardId, boards.id))
+      .where(
+        and(
+          eq(notes.id, noteId),
+          eq(notes.boardId, boardId),
+          isNull(notes.deletedAt)
+        )
+      )
+      .limit(1);
 
-    if (!note || note.deletedAt) {
+    if (!noteWithBoard[0]) {
       return NextResponse.json({ error: "Note not found" }, { status: 404 });
     }
 
-    if (note.board.organizationId !== user.organizationId || note.boardId !== boardId) {
+    if (noteWithBoard[0].board.organizationId !== user[0].organizationId) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
-    if (note.createdBy !== session.user.id && !user.isAdmin) {
-      return NextResponse.json(
-        { error: "Only the note author or admin can edit this note" },
-        { status: 403 }
-      );
-    }
+    // Update note
+    const updateData: any = {};
+    if (content !== undefined) updateData.content = content;
+    if (color !== undefined) updateData.color = color;
+    if (archivedAt !== undefined) updateData.archivedAt = archivedAt;
 
-    let sanitizedChecklistItems:
-      | Array<{ id: string; content: string; checked: boolean; order: number }>
-      | undefined;
+    await db
+      .update(notes)
+      .set(updateData)
+      .where(eq(notes.id, noteId));
 
-    if (checklistItems !== undefined) {
-      if (!Array.isArray(checklistItems)) {
-        return NextResponse.json({ error: "checklistItems must be an array" }, { status: 400 });
-      }
+    // Handle checklist items if provided
+    if (checklistData && Array.isArray(checklistData)) {
+      // Delete existing checklist items
+      await db
+        .delete(checklistItems)
+        .where(eq(checklistItems.noteId, noteId));
 
-      for (const item of checklistItems) {
-        if (
-          typeof item.id !== "string" ||
-          typeof item.content !== "string" ||
-          typeof item.checked !== "boolean" ||
-          typeof item.order !== "number"
-        ) {
-          return NextResponse.json(
-            {
-              error:
-                "Each checklist item must have id (string), content (string), checked (boolean), order (number)",
-            },
-            { status: 400 }
-          );
-        }
-      }
-
-      const ids = checklistItems.map((i: { id: string }) => i.id);
-      const uniqueIds = new Set(ids);
-      if (ids.length !== uniqueIds.size) {
-        return NextResponse.json({ error: "Duplicate checklist item IDs found" }, { status: 400 });
-      }
-
-      sanitizedChecklistItems = [...checklistItems]
-        .sort((a, b) => a.order - b.order)
-        .map((item, i) => ({ ...item, order: i }));
-    }
-
-    let checklistChanges:
-      | {
-          created: Array<{ id: string; content: string; checked: boolean; order: number }>;
-          updated: Array<{
-            id: string;
-            content: string;
-            checked: boolean;
-            order: number;
-            previous: { content: string; checked: boolean; order: number };
-          }>;
-          deleted: Array<{ id: string; content: string; checked: boolean; order: number }>;
-        }
-      | undefined;
-
-    const updatedNote = await db.$transaction(async (tx) => {
-      if (sanitizedChecklistItems !== undefined) {
-        const existing = await tx.checklistItem.findMany({
-          where: { noteId },
-          orderBy: { order: "asc" },
-        });
-
-        const existingMap = new Map(existing.map((i) => [i.id, i]));
-        const incomingMap = new Map(sanitizedChecklistItems.map((i) => [i.id, i]));
-
-        const toCreate = sanitizedChecklistItems.filter((i) => !existingMap.has(i.id));
-        const toUpdate = sanitizedChecklistItems.filter((i) => {
-          const prev = existingMap.get(i.id);
-          return (
-            prev &&
-            (prev.content !== i.content || prev.checked !== i.checked || prev.order !== i.order)
-          );
-        });
-        const toDelete = existing.filter((i) => !incomingMap.has(i.id));
-
-        if (toDelete.length) {
-          await tx.checklistItem.deleteMany({ where: { id: { in: toDelete.map((i) => i.id) } } });
-        }
-        if (toCreate.length) {
-          await tx.checklistItem.createMany({
-            data: toCreate.map((i) => ({
-              id: i.id,
-              content: i.content,
-              checked: i.checked,
-              order: i.order,
+      // Insert new checklist items
+      if (checklistData.length > 0) {
+        await db
+          .insert(checklistItems)
+          .values(
+            checklistData.map((item: any, index: number) => ({
+              id: crypto.randomUUID(),
               noteId,
-            })),
-          });
-        }
-        for (const i of toUpdate) {
-          await tx.checklistItem.update({
-            where: { id: i.id },
-            data: { content: i.content, checked: i.checked, order: i.order },
-          });
-        }
-
-        checklistChanges = {
-          created: toCreate,
-          updated: toUpdate.map((i) => ({
-            ...i,
-            previous: {
-              content: existingMap.get(i.id)!.content,
-              checked: existingMap.get(i.id)!.checked,
-              order: existingMap.get(i.id)!.order,
-            },
-          })),
-          deleted: toDelete,
-        };
-      }
-
-      return tx.note.update({
-        where: { id: noteId },
-        data: {
-          ...(content !== undefined && { content }),
-          ...(color !== undefined && { color }),
-          ...(archivedAt !== undefined && { archivedAt }),
-        },
-        include: {
-          user: { select: { id: true, name: true, email: true } },
-          board: { select: { name: true, sendSlackUpdates: true } },
-          checklistItems: { orderBy: { order: "asc" } },
-        },
-      });
-    });
-
-    if (content !== undefined && user.organization?.slackWebhookUrl && !note.slackMessageId) {
-      const wasEmpty = !hasValidContent(note.content);
-      const hasContent = hasValidContent(content);
-
-      if (
-        wasEmpty &&
-        hasContent &&
-        shouldSendNotification(
-          session.user.id,
-          boardId,
-          updatedNote.board.name,
-          updatedNote.board.sendSlackUpdates
-        )
-      ) {
-        const slackMessage = formatNoteForSlack(
-          updatedNote,
-          updatedNote.board.name,
-          user.name || user.email || "Unknown User"
-        );
-        const messageId = await sendSlackMessage(user.organization.slackWebhookUrl, {
-          text: slackMessage,
-          username: "Coldboard",
-          icon_emoji: ":clipboard:",
-        });
-
-        if (messageId) {
-          await db.note.update({
-            where: { id: noteId },
-            data: { slackMessageId: messageId },
-          });
-        }
-      }
-    }
-
-    if (archivedAt !== undefined && user.organization?.slackWebhookUrl && note.slackMessageId) {
-      const userName = note.user?.name || note.user?.email || "Unknown User";
-      const boardName = note.board.name;
-      const isArchived = archivedAt !== null;
-      await updateSlackMessage(
-        user.organization.slackWebhookUrl,
-        note.content,
-        isArchived,
-        boardName,
-        userName
-      );
-    }
-
-    if (user.organization?.slackWebhookUrl && checklistChanges) {
-      const boardName = updatedNote.board.name;
-      const userName = user.name || user.email || "Unknown User";
-
-      for (const item of checklistChanges.created) {
-        if (
-          hasValidContent(item.content) &&
-          shouldSendNotification(
-            session.user.id,
-            boardId,
-            boardName,
-            updatedNote.board.sendSlackUpdates
-          )
-        ) {
-          await sendTodoNotification(
-            user.organization.slackWebhookUrl,
-            item.content,
-            boardName,
-            userName,
-            "added"
+              text: item.text,
+              completed: item.completed || false,
+              order: index,
+              updatedAt: new Date(),
+              content: item.text // Required field that maps to text
+            }))
           );
-        }
-      }
-
-      for (const u of checklistChanges.updated) {
-        if (
-          !u.previous.checked &&
-          u.checked &&
-          shouldSendNotification(
-            session.user.id,
-            boardId,
-            boardName,
-            updatedNote.board.sendSlackUpdates
-          )
-        ) {
-          await sendTodoNotification(
-            user.organization.slackWebhookUrl,
-            u.content,
-            boardName,
-            userName,
-            "completed"
-          );
-        }
       }
     }
 
-    return NextResponse.json({ note: updatedNote });
+    // Get updated note with user and checklist items
+    const updatedNote = await db
+      .select({
+        id: notes.id,
+        content: notes.content,
+        color: notes.color,
+        boardId: notes.boardId,
+        createdBy: notes.createdBy,
+        createdAt: notes.createdAt,
+        updatedAt: notes.updatedAt,
+        archivedAt: notes.archivedAt,
+        user: {
+          id: users.id,
+          name: users.name,
+          email: users.email,
+        },
+      })
+      .from(notes)
+      .innerJoin(users, eq(notes.createdBy, users.id))
+      .where(eq(notes.id, noteId))
+      .limit(1);
+
+    const updatedChecklistItems = await db
+      .select()
+      .from(checklistItems)
+      .where(eq(checklistItems.noteId, noteId))
+      .orderBy(checklistItems.order);
+
+    const noteWithChecklists = {
+      ...updatedNote[0],
+      checklistItems: updatedChecklistItems,
+    };
+
+    return NextResponse.json({ note: noteWithChecklists });
   } catch (error) {
     console.error("Error updating note:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
-// Delete a note (soft delete)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; noteId: string }> }
@@ -300,52 +227,51 @@ export async function DELETE(
 
     const { id: boardId, noteId } = await params;
 
-    // Verify user has access to this board (same organization)
-    const user = await db.user.findUnique({
-      where: { id: session.user.id },
-      include: { organization: true },
-    });
+    // Verify user has access to this note
+    const user = await db
+      .select({ organizationId: users.organizationId })
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1);
 
-    if (!user?.organizationId) {
+    if (!user[0]?.organizationId) {
       return NextResponse.json({ error: "No organization found" }, { status: 403 });
     }
 
-    // Verify the note belongs to a board in the user's organization
-    const note = await db.note.findUnique({
-      where: { id: noteId },
-      include: { board: true },
-    });
+    // Check note exists and user has access
+    const noteWithBoard = await db
+      .select({
+        id: notes.id,
+        board: {
+          organizationId: boards.organizationId,
+        },
+      })
+      .from(notes)
+      .innerJoin(boards, eq(notes.boardId, boards.id))
+      .where(
+        and(
+          eq(notes.id, noteId),
+          eq(notes.boardId, boardId),
+          isNull(notes.deletedAt)
+        )
+      )
+      .limit(1);
 
-    if (!note) {
+    if (!noteWithBoard[0]) {
       return NextResponse.json({ error: "Note not found" }, { status: 404 });
     }
 
-    // Check if note is already soft-deleted
-    if (note.deletedAt) {
-      return NextResponse.json({ error: "Note not found" }, { status: 404 });
-    }
-
-    if (note.board.organizationId !== user.organizationId || note.boardId !== boardId) {
+    if (noteWithBoard[0].board.organizationId !== user[0].organizationId) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
-    // Check if user is the author of the note or an admin
-    if (note.createdBy !== session.user.id && !user.isAdmin) {
-      return NextResponse.json(
-        { error: "Only the note author or admin can delete this note" },
-        { status: 403 }
-      );
-    }
+    // Soft delete the note
+    await db
+      .update(notes)
+      .set({ deletedAt: new Date() })
+      .where(eq(notes.id, noteId));
 
-    // Soft delete: set deletedAt timestamp instead of actually deleting
-    await db.note.update({
-      where: { id: noteId },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ message: "Note deleted successfully" });
   } catch (error) {
     console.error("Error deleting note:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

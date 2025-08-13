@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
@@ -185,7 +185,36 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
     return filteredNotes;
   };
 
-  const calculateGridLayout = () => {
+  const fetchBoardData = useCallback(async () => {
+    try {
+      const boardResponse = await fetch(`/api/boards/${boardId}`);
+      if (boardResponse.status === 404) {
+        setBoard(null);
+        setLoading(false);
+        return;
+      }
+      if (boardResponse.status === 401 || boardResponse.status === 403) {
+        router.push("/auth/signin");
+        return;
+      }
+      if (boardResponse.ok) {
+        const { board } = await boardResponse.json();
+        setBoard(board);
+      }
+
+      const notesResponse = await fetch(`/api/boards/${boardId}/notes`);
+      if (notesResponse.ok) {
+        const { notes } = await notesResponse.json();
+        setNotes(notes);
+      }
+    } catch (error) {
+      console.error("Error fetching board data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [boardId, router]);
+
+  const calculateGridLayout = useCallback(() => {
     if (typeof window === "undefined") return [];
 
     const config = getResponsiveConfig();
@@ -229,9 +258,9 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
         height: noteHeight,
       };
     });
-  };
+  }, [filteredNotes]);
 
-  const calculateMobileLayout = () => {
+  const calculateMobileLayout = useCallback(() => {
     if (typeof window === "undefined") return [];
 
     const config = getResponsiveConfig();
@@ -273,7 +302,7 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
         height: noteHeight,
       };
     });
-  };
+  }, [filteredNotes]);
 
   useEffect(() => {
     const initializeParams = async () => {
@@ -287,7 +316,7 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
     if (boardId) {
       fetchBoardData();
     }
-  }, [boardId]);
+  }, [boardId, fetchBoardData]);
 
   useEffect(() => {
     let resizeTimeout: NodeJS.Timeout;
@@ -312,35 +341,6 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
     };
   }, []);
 
-  const fetchBoardData = async () => {
-    try {
-      const boardResponse = await fetch(`/api/boards/${boardId}`);
-      if (boardResponse.status === 404) {
-        setBoard(null);
-        setLoading(false);
-        return;
-      }
-      if (boardResponse.status === 401 || boardResponse.status === 403) {
-        router.push("/auth/signin");
-        return;
-      }
-      if (boardResponse.ok) {
-        const { board } = await boardResponse.json();
-        setBoard(board);
-      }
-
-      const notesResponse = await fetch(`/api/boards/${boardId}/notes`);
-      if (notesResponse.ok) {
-        const { notes } = await notesResponse.json();
-        setNotes(notes);
-      }
-    } catch (error) {
-      console.error("Error fetching board data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const uniqueAuthors = useMemo(() => getUniqueAuthors(notes), [notes]);
 
   const filteredNotes = useMemo(
@@ -350,7 +350,7 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
 
   const layoutNotes = useMemo(
     () => (isMobile ? calculateMobileLayout() : calculateGridLayout()),
-    [isMobile, filteredNotes, calculateMobileLayout, calculateGridLayout]
+    [isMobile, calculateMobileLayout, calculateGridLayout]
   );
 
   const boardHeight = useMemo(() => {

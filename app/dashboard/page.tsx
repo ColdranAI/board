@@ -84,11 +84,7 @@ export default function Dashboard() {
     },
   });
 
-  useEffect(() => {
-    fetchUserAndBoards();
-  }, []);
-
-  const fetchUserAndBoards = async () => {
+  const fetchUserAndBoards = useCallback(async () => {
     try {
       const userResponse = await fetch("/api/user");
       if (userResponse.status === 401) {
@@ -119,7 +115,11 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    fetchUserAndBoards();
+  }, [fetchUserAndBoards]);
 
   const handleAddBoard = async (values: z.infer<typeof formSchema>) => {
     const { name, description } = values;

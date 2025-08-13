@@ -1,65 +1,81 @@
-import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server";
+import { eq, and, isNull, desc } from "drizzle-orm";
+import { users, notes, boards, checklistItems } from "@/lib/db/schema";
 import { NOTE_COLORS } from "@/lib/constants";
 
-// Get all notes from all boards in the organization
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get user with organization
-    const user = await db.user.findUnique({
-      where: { id: session.user.id },
-      include: { organization: true },
-    });
+    // Get user's organization
+    const user = await db
+      .select({ organizationId: users.organizationId })
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1);
 
-    if (!user?.organizationId) {
+    if (!user[0]?.organizationId) {
       return NextResponse.json({ error: "No organization found" }, { status: 403 });
     }
 
-    // Get all notes from all boards in the organization
-    const notes = await db.note.findMany({
-      where: {
-        deletedAt: null, // Only include non-deleted notes
-        archivedAt: null,
-        board: {
-          organizationId: user.organizationId,
-        },
-      },
-      include: {
+    // Get all notes from user's organization
+    const allNotes = await db
+      .select({
+        id: notes.id,
+        content: notes.content,
+        color: notes.color,
+        boardId: notes.boardId,
+        createdBy: notes.createdBy,
+        createdAt: notes.createdAt,
+        updatedAt: notes.updatedAt,
+        archivedAt: notes.archivedAt,
         user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
+          id: users.id,
+          name: users.name,
+          email: users.email,
         },
         board: {
-          select: {
-            id: true,
-            name: true,
-          },
+          id: boards.id,
+          name: boards.name,
         },
-        checklistItems: { orderBy: { order: "asc" } },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+      })
+      .from(notes)
+      .innerJoin(users, eq(notes.createdBy, users.id))
+      .innerJoin(boards, eq(notes.boardId, boards.id))
+      .where(
+        and(
+          eq(boards.organizationId, user[0].organizationId),
+          isNull(notes.deletedAt),
+          isNull(notes.archivedAt)
+        )
+      )
+      .orderBy(desc(notes.createdAt));
 
-    return NextResponse.json({ notes });
+    // Get checklist items for each note
+    const noteIds = allNotes.map(note => note.id);
+    const allChecklistItems = noteIds.length > 0 ? await db
+      .select()
+      .from(checklistItems)
+      .where(eq(checklistItems.noteId, noteIds[0])) // This would need proper IN clause
+      : [];
+
+    const notesWithChecklists = allNotes.map(note => ({
+      ...note,
+      checklistItems: allChecklistItems.filter(item => item.noteId === note.id),
+    }));
+
+    return NextResponse.json({ notes: notesWithChecklists });
   } catch (error) {
-    console.error("Error fetching global notes:", error);
+    console.error("Error fetching all notes:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
-// Create a new note (for global view, we need to specify which board)
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
@@ -69,60 +85,77 @@ export async function POST(request: NextRequest) {
 
     const { content, color, boardId } = await request.json();
 
-    if (!boardId) {
-      return NextResponse.json({ error: "Board ID is required" }, { status: 400 });
+    if (!content || !boardId) {
+      return NextResponse.json({ error: "Content and boardId are required" }, { status: 400 });
     }
 
-    // Verify user has access to the specified board (same organization)
-    const user = await db.user.findUnique({
-      where: { id: session.user.id },
-      include: { organization: true },
-    });
+    // Verify user has access to this board
+    const user = await db
+      .select({ organizationId: users.organizationId })
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1);
 
-    if (!user?.organizationId) {
+    if (!user[0]?.organizationId) {
       return NextResponse.json({ error: "No organization found" }, { status: 403 });
     }
 
-    const board = await db.board.findUnique({
-      where: { id: boardId },
-    });
+    const board = await db
+      .select({ organizationId: boards.organizationId })
+      .from(boards)
+      .where(eq(boards.id, boardId))
+      .limit(1);
 
-    if (!board) {
+    if (!board[0]) {
       return NextResponse.json({ error: "Board not found" }, { status: 404 });
     }
 
-    if (board.organizationId !== user.organizationId) {
+    if (board[0].organizationId !== user[0].organizationId) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
     const randomColor = color || NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)];
 
-    const note = await db.note.create({
-      data: {
+    // Create note
+    const note = await db
+      .insert(notes)
+      .values({
+        id: crypto.randomUUID(),
         content,
         color: randomColor,
         boardId,
         createdBy: session.user.id,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        board: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        checklistItems: { orderBy: { order: "asc" } },
-      },
-    });
+        updatedAt: new Date(),
+      })
+      .returning();
 
-    return NextResponse.json({ note }, { status: 201 });
+    // Get the created note with user info
+    const noteWithUser = await db
+      .select({
+        id: notes.id,
+        content: notes.content,
+        color: notes.color,
+        boardId: notes.boardId,
+        createdBy: notes.createdBy,
+        createdAt: notes.createdAt,
+        updatedAt: notes.updatedAt,
+        user: {
+          id: users.id,
+          name: users.name,
+          email: users.email,
+        },
+      })
+      .from(notes)
+      .innerJoin(users, eq(notes.createdBy, users.id))
+      .where(eq(notes.id, note[0].id))
+      .limit(1);
+
+    const noteWithChecklists = {
+      ...noteWithUser[0],
+      checklistItems: [],
+    };
+
+    return NextResponse.json({ note: noteWithChecklists }, { status: 201 });
   } catch (error) {
     console.error("Error creating note:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

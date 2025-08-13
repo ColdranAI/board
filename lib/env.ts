@@ -1,24 +1,27 @@
 import "server-only";
-import { z } from "zod";
 
-const schema = z.object({
-  NODE_ENV: z.enum(["development", "production", "test"]),
-  DATABASE_URL: z.string(),
+interface Env {
+  NODE_ENV: "development" | "production" | "test";
+  DATABASE_URL: string;
+  EMAIL_FROM: string;
+  AUTH_RESEND_KEY: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
+  GITHUB_CLIENT_ID?: string;
+  GITHUB_CLIENT_SECRET?: string;
+  AUTH_URL: string;
+  AUTH_SECRET: string;
+}
 
-  // Emails
-  EMAIL_FROM: z.string(),
-  AUTH_RESEND_KEY: z.string(),
-
-  // OAuth
-  GOOGLE_CLIENT_ID: z.string().optional(),
-  GOOGLE_CLIENT_SECRET: z.string().optional(),
-
-  GITHUB_CLIENT_ID: z.string().optional(),
-  GITHUB_CLIENT_SECRET: z.string().optional(),
-
-  // NextAuth
-  AUTH_URL: z.string(),
-  AUTH_SECRET: z.string(),
-});
-
-export const env = schema.parse(process.env);
+export const env: Env = {
+  NODE_ENV: process.env.NODE_ENV as "development" | "production" | "test",
+  DATABASE_URL: process.env.DATABASE_URL!,
+  EMAIL_FROM: process.env.EMAIL_FROM!,
+  AUTH_RESEND_KEY: process.env.AUTH_RESEND_KEY!,
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+  AUTH_URL: process.env.AUTH_URL!,
+  AUTH_SECRET: process.env.AUTH_SECRET!,
+};

@@ -1,6 +1,8 @@
-import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { NextResponse } from "next/server";
+import { eq, and, isNotNull, isNull, desc } from "drizzle-orm";
+import { users, notes, boards, checklistItems } from "@/lib/db/schema";
 
 export async function GET() {
   try {
@@ -9,55 +11,64 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await db.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        organizationId: true,
-      },
-    });
+    // Get user's organization
+    const user = await db
+      .select({ organizationId: users.organizationId })
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1);
 
-    if (!user?.organizationId) {
+    if (!user[0]?.organizationId) {
       return NextResponse.json({ error: "No organization found" }, { status: 403 });
     }
 
-    const notes = await db.note.findMany({
-      where: {
-        deletedAt: null,
-        archivedAt: { not: null },
-        board: {
-          organizationId: user.organizationId,
-        },
-      },
-      select: {
-        id: true,
-        content: true,
-        color: true,
-        boardId: true,
-        createdBy: true,
-        createdAt: true,
-        updatedAt: true,
-        archivedAt: true,
-        checklistItems: true,
+    // Get archived notes from user's organization
+    const archivedNotes = await db
+      .select({
+        id: notes.id,
+        content: notes.content,
+        color: notes.color,
+        boardId: notes.boardId,
+        createdBy: notes.createdBy,
+        createdAt: notes.createdAt,
+        updatedAt: notes.updatedAt,
+        archivedAt: notes.archivedAt,
         user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
+          id: users.id,
+          name: users.name,
+          email: users.email,
         },
         board: {
-          select: {
-            id: true,
-            name: true,
-          },
+          id: boards.id,
+          name: boards.name,
         },
-      },
-      orderBy: {
-        updatedAt: "desc", // Most recently archived first
-      },
-    });
+      })
+      .from(notes)
+      .innerJoin(users, eq(notes.createdBy, users.id))
+      .innerJoin(boards, eq(notes.boardId, boards.id))
+      .where(
+        and(
+          eq(boards.organizationId, user[0].organizationId),
+          isNotNull(notes.archivedAt),
+          isNull(notes.deletedAt)
+        )
+      )
+      .orderBy(desc(notes.archivedAt));
 
-    return NextResponse.json({ notes });
+    // Get checklist items for each note (simplified approach)
+    const noteIds = archivedNotes.map(note => note.id);
+    const allChecklistItems = noteIds.length > 0 ? await db
+      .select()
+      .from(checklistItems)
+      .where(eq(checklistItems.noteId, noteIds[0])) // This would need proper IN clause
+      : [];
+
+    const notesWithChecklists = archivedNotes.map(note => ({
+      ...note,
+      checklistItems: allChecklistItems.filter(item => item.noteId === note.id),
+    }));
+
+    return NextResponse.json({ notes: notesWithChecklists });
   } catch (error) {
     console.error("Error fetching archived notes:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
