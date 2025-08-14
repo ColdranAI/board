@@ -55,7 +55,7 @@ export function Navigation({ children }: NavigationProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background dark:bg-zinc-950">
+    <div className=" bg-neutral-50 dark:bg-zinc-950">
       {/* Fixed Navigation Header */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-card dark:bg-zinc-900 border-b border-neutral-200 dark:border-zinc-800 shadow-sm">
         <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">

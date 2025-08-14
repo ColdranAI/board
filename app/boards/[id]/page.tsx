@@ -370,7 +370,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
     const adjustedNoteWidth = Math.max(minWidth, Math.min(maxWidth, calculatedNoteWidth));
 
     const offsetX = config.containerPadding;
-    const columnBottoms: number[] = new Array(actualColumns).fill(config.containerPadding);
+    const columnBottoms: number[] = new Array(actualColumns).fill(config.containerPadding + 64); // Account for navigation bar height
 
     return filteredNotes.map((note) => {
       const noteHeight = calculateNoteHeight(note, adjustedNoteWidth, config.notePadding);
@@ -404,7 +404,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
     const availableWidth = containerWidth - (actualColumns - 1) * config.gridGap;
     const noteWidth = Math.floor(availableWidth / actualColumns);
 
-    const columnBottoms: number[] = new Array(actualColumns).fill(config.containerPadding);
+    const columnBottoms: number[] = new Array(actualColumns).fill(config.containerPadding + 64); // Account for navigation bar height
 
     return filteredNotes.map((note) => {
       const noteHeight = calculateNoteHeight(note, noteWidth, config.notePadding);
@@ -432,7 +432,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
   );
 
   const boardHeight = useMemo(() => {
-    if (layoutNotes.length === 0) return "calc(100vh - 128px)"; // Account for both nav bars
+    if (layoutNotes.length === 0) return "calc(100vh - 64px)"; // Account for navigation bar height
     const maxBottom = Math.max(...layoutNotes.map((n) => n.y + n.height));
     const minHeight = typeof window !== "undefined" && window.innerWidth < 768 ? 500 : 600;
     const calculatedHeight = Math.max(minHeight, maxBottom + 100);
@@ -707,187 +707,15 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
   }
 
   return (
-    <div className="bg-background dark:bg-zinc-950">
-      {/* Board Controls Header */}
-      <div className="bg-card dark:bg-zinc-900 border-b border-neutral-200 dark:border-zinc-800 shadow-sm">
-        <div className="flex flex-wrap sm:flex-nowrap justify-between items-center h-auto sm:h-16 p-2 sm:p-0">
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:space-x-3 w-full sm:w-auto">
-
-            {/* Board selector */}
-            <div className="relative board-dropdown flex-1 sm:flex-none">
-              <Button
-                onClick={() => setShowBoardDropdown(!showBoardDropdown)}
-                className="flex items-center justify-between border border-neutral-200 dark:border-zinc-800 space-x-2 text-foreground dark:text-zinc-100 hover:text-foreground dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:focus:ring-zinc-600 rounded-md px-3 py-2 cursor-pointer w-full sm:w-auto"
-              >
-                <div className="text-sm font-semibold">
-                  {boardId === "all-notes" ? "All notes" : boardId === "archive" ? "Archive" : board?.name}
-                </div>
-                <ChevronDown
-                  className={`w-4 h-4 text-muted-foreground dark:text-zinc-400 transition-transform ${
-                    showBoardDropdown ? "rotate-180" : ""
-                  }`}
-                />
-              </Button>
-
-              {showBoardDropdown && (
-                <div className="fixed sm:absolute left-0 mt-2 w-full sm:w-64 bg-white dark:bg-zinc-900 rounded-md shadow-lg border border-neutral-200 dark:border-zinc-800 z-50 max-h-80 overflow-y-auto">
-                  <div className="py-1">
-                    <Link
-                      href="/boards/all-notes"
-                      className={`block px-4 py-2 text-sm hover:bg-accent dark:hover:bg-zinc-800 ${
-                        boardId === "all-notes"
-                          ? "bg-neutral-50 dark:bg-zinc-900/70 text-neutral-700 dark:text-neutral-300"
-                          : "text-foreground dark:text-zinc-100"
-                      }`}
-                      onClick={() => setShowBoardDropdown(false)}
-                    >
-                      <div className="font-medium">All notes</div>
-                      <div className="text-xs text-muted-foreground dark:text-zinc-400 mt-1">Notes from all boards</div>
-                    </Link>
-
-                    <Link
-                      href="/boards/archive"
-                      className={`block px-4 py-2 text-sm hover:bg-accent dark:hover:bg-zinc-800 ${
-                        boardId === "archive"
-                          ? "bg-neutral-50 dark:bg-zinc-900/70 text-neutral-700 dark:text-neutral-300"
-                          : "text-foreground dark:text-zinc-100"
-                      }`}
-                      onClick={() => setShowBoardDropdown(false)}
-                    >
-                      <div className="font-medium">Archive</div>
-                      <div className="text-xs text-muted-foreground dark:text-zinc-400 mt-1">Archived notes from all boards</div>
-                    </Link>
-
-                    {allBoards.length > 0 && <div className="border-t border-neutral-200 dark:border-zinc-800 my-1" />}
-
-                    {allBoards.map((b) => (
-                      <Link
-                        key={b.id}
-                        href={`/boards/${b.id}`}
-                        className={`block px-4 py-2 text-sm hover:bg-accent dark:hover:bg-zinc-800 ${
-                          b.id === boardId
-                            ? "bg-neutral-50 dark:bg-zinc-900/70 text-neutral-700 dark:text-neutral-300"
-                            : "text-foreground dark:text-zinc-100"
-                        }`}
-                        onClick={() => setShowBoardDropdown(false)}
-                      >
-                        <div className="font-medium">{b.name}</div>
-                        {b.description && (
-                          <div className="text-xs text-muted-foreground dark:text-zinc-400 mt-1">{b.description}</div>
-                        )}
-                      </Link>
-                    ))}
-
-                    {allBoards.length > 0 && <div className="border-t border-neutral-200 dark:border-zinc-800 my-1" />}
-
-                    <Button
-                      onClick={() => {
-                        setShowAddBoard(true);
-                        setShowBoardDropdown(false);
-                      }}
-                      className="flex items-center w-full px-4 py-2 text-sm text-foreground dark:text-zinc-100 hover:bg-accent dark:hover:bg-zinc-800"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      <span className="font-medium">Create new board</span>
-                    </Button>
-
-                    {boardId !== "all-notes" && boardId !== "archive" && (
-                      <Button
-                        onClick={() => {
-                          setBoardSettings({
-                            sendSlackUpdates: (board as any)?.sendSlackUpdates ?? true,
-                          });
-                          setBoardSettingsDialog(true);
-                          setShowBoardDropdown(false);
-                        }}
-                        className="flex items-center w-full px-4 py-2 text-sm text-foreground dark:text-zinc-100 hover:bg-accent dark:hover:bg-zinc-800"
-                      >
-                        <Settings className="w-4 h-4 mr-2" />
-                        <span className="font-medium">Board settings</span>
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Filters */}
-            <div className="relative board-dropdown flex-1 sm:flex-none">
-              <FilterPopover
-                startDate={dateRange.startDate}
-                endDate={dateRange.endDate}
-                onDateRangeChange={(startDate, endDate) => {
-                  const newDateRange = { startDate, endDate };
-                  setDateRange(newDateRange);
-                  updateURL(undefined, newDateRange);
-                }}
-                selectedAuthor={selectedAuthor}
-                authors={uniqueAuthors}
-                onAuthorChange={(authorId) => {
-                  setSelectedAuthor(authorId);
-                  updateURL(undefined, undefined, authorId);
-                }}
-                className="min-w-fit"
-              />
-            </div>
-          </div>
-
-          {/* Right cluster: search, add, user */}
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-            {/* Search */}
-            <div className="relative flex-1 sm:flex-none min-w-[150px]">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-muted-foreground dark:text-zinc-400" />
-              </div>
-              <input
-                aria-label="Search notes"
-                type="text"
-                placeholder="Search notes..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full sm:w-64 pl-10 pr-8 py-2 border border-neutral-200 dark:border-zinc-800 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:focus:ring-zinc-600 focus:border-transparent text-sm bg-background dark:bg-zinc-900 text-foreground dark:text-zinc-100 placeholder:text-muted-foreground dark:placeholder:text-zinc-400"
-              />
-              {searchTerm && (
-                <Button
-                  onClick={() => {
-                    setSearchTerm("");
-                    setDebouncedSearchTerm("");
-                    updateURL("");
-                  }}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground dark:text-zinc-400 hover:text-foreground dark:hover:text-zinc-100 cursor-pointer"
-                >
-                  ×
-                </Button>
-              )}
-            </div>
-
-            {/* Add note */}
-            <Button
-              onClick={() => {
-                if (boardId === "all-notes" && allBoards.length > 0) {
-                  handleAddNote(allBoards[0].id);
-                } else {
-                  handleAddNote();
-                }
-              }}
-              className="flex items-center justify-center w-10 h-10 sm:w-auto sm:h-auto sm:space-x-2 bg-neutral-600 hover:bg-neutral-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer font-medium"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Add Note</span>
-            </Button>
-
-          </div>
-        </div>
-      </div>
+    <div className="bg-neutral-50 dark:bg-zinc-950">
 
       {/* Board area */}
       <div
         ref={boardRef}
         className="bg-neutral-50 dark:bg-zinc-950"
-        style={{ height: boardHeight, minHeight: "calc(100vh - 128px)" }}
       >
         {/* Masonry notes */}
-        <div>
+        <div className=" bg-neutral-50 dark:bg-zinc-950">
           {layoutNotes.map((note) => (
             <NoteCard
               key={note.id}
@@ -911,13 +739,37 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
               }}
             />
           ))}
+            <div className="flex flex-col py-20 items-center justify-center text-neutral-500 dark:text-neutral-400 space-y-6" style={{ marginTop: '64px' }}>
+    <div className="flex flex-col items-center">
+      <div className="text-sm mb-2">Add Note to Get Started</div>
+    </div>
+
+    {/* AddNoteCard visual */}
+    <AddNoteCard
+      onClick={() => {
+        if (boardId === "all-notes" && allBoards.length > 0) {
+          handleAddNote(allBoards[0].id);
+        } else if (boardId === "archive") {
+          setErrorDialog({
+            open: true,
+            title: "Cannot Add Note",
+            description:
+              "You cannot add notes directly to the archive. Notes are archived from other boards.",
+          });
+        } else {
+          handleAddNote();
+        }
+      }}
+      className="max-w-xs w-full"
+    />
+  </div>
         </div>
 
         {/* Empty-state (filters active) */}
         {filteredNotes.length === 0 &&
           notes.length > 0 &&
           (searchTerm || dateRange.startDate || dateRange.endDate || selectedAuthor) && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-neutral-500 dark:text-neutral-400">
+            <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-neutral-500 dark:text-neutral-400" style={{ top: '64px' }}>
               <Search className="w-12 h-12 mb-4 text-neutral-400 dark:text-neutral-500" />
               <div className="text-xl mb-2">No notes found</div>
               <div className="text-sm mb-4 text-center">
@@ -949,7 +801,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
             </div>
           )}
 {notes.length === 0 && (
-  <div className="flex flex-col py-20 items-center justify-center text-neutral-500 dark:text-neutral-400 space-y-6">
+  <div className="flex flex-col py-20 items-center justify-center text-neutral-500 dark:text-neutral-400 space-y-6" style={{ marginTop: '64px' }}>
     <div className="flex flex-col items-center">
       <div className="text-sm mb-2">Add Note to Get Started</div>
     </div>

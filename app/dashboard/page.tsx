@@ -40,6 +40,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { NavigationBar } from "@/components/navigation-bar";
+import { createDashboardNavConfig } from "@/components/navigation-configs";
+
 
 
 // Dashboard-specific extended types
