@@ -451,7 +451,7 @@ export default function OrganizationSettingsPage() {
   return (
     <div className="space-y-6 min-h-screen px-2 sm:px-0">
       {/* Organization Info */}
-      <Card className="p-6 bg-white dark:bg-black border border-gray-200 dark:border-zinc-800">
+      <Card className="p-6 bg-white dark:bg-black border border-neutral-200 dark:border-zinc-800">
         <div className="space-y-6">
           <div>
             <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
@@ -481,7 +481,7 @@ export default function OrganizationSettingsPage() {
             <Button
               onClick={handleSaveOrganization}
               disabled={saving || orgName === originalOrgName || !user?.isAdmin}
-              className="bg-neutral-600 hover:bg-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white dark:text-zinc-100"
+              className="bg-neutral-600 hover:bg-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-800 disabled:bg-neutral-400 disabled:cursor-not-allowed text-white dark:text-zinc-100"
               title={!user?.isAdmin ? "Only admins can update organization settings" : undefined}
             >
               {saving ? "Saving..." : "Save Changes"}
@@ -491,7 +491,7 @@ export default function OrganizationSettingsPage() {
       </Card>
 
       {/* Slack Integration */}
-      <Card className="p-6 bg-white dark:bg-black border border-gray-200 dark:border-zinc-800">
+      <Card className="p-6 bg-white dark:bg-black border border-neutral-200 dark:border-zinc-800">
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
@@ -534,7 +534,7 @@ export default function OrganizationSettingsPage() {
             <Button
               onClick={handleSaveOrganization}
               disabled={saving || slackWebhookUrl === originalSlackWebhookUrl || !user?.isAdmin}
-              className="bg-neutral-600 hover:bg-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white dark:text-zinc-100"
+              className="bg-neutral-600 hover:bg-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-800 disabled:bg-neutral-400 disabled:cursor-not-allowed text-white dark:text-zinc-100"
               title={!user?.isAdmin ? "Only admins can update organization settings" : undefined}
             >
               {saving ? "Saving..." : "Save changes"}
@@ -544,7 +544,7 @@ export default function OrganizationSettingsPage() {
       </Card>
 
       {/* Team Members */}
-      <Card className="p-6 bg-white dark:bg-black border border-gray-200 dark:border-zinc-800">
+      <Card className="p-6 bg-white dark:bg-black border border-neutral-200 dark:border-zinc-800">
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
@@ -629,7 +629,7 @@ export default function OrganizationSettingsPage() {
       </Card>
 
       {/* Invite Members */}
-      <Card className="p-6 bg-white dark:bg-black border border-gray-200 dark:border-zinc-800">
+      <Card className="p-6 bg-white dark:bg-black border border-neutral-200 dark:border-zinc-800">
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
@@ -655,7 +655,7 @@ export default function OrganizationSettingsPage() {
             <Button
               type="submit"
               disabled={inviting || !user?.isAdmin}
-              className="disabled:bg-gray-400 disabled:cursor-not-allowed bg-neutral-600 hover:bg-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-800 text-white dark:text-zinc-100"
+              className="disabled:bg-neutral-400 disabled:cursor-not-allowed bg-neutral-600 hover:bg-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-800 text-white dark:text-zinc-100"
               title={!user?.isAdmin ? "Only admins can invite new team members" : undefined}
             >
               <UserPlus className="w-4 h-4 mr-2" />
@@ -694,7 +694,7 @@ export default function OrganizationSettingsPage() {
       </Card>
 
       {/* Self-Serve Invite Links */}
-      <Card className="p-6 bg-white dark:bg-black border border-gray-200 dark:border-zinc-800">
+      <Card className="p-6 bg-white dark:bg-black border border-neutral-200 dark:border-zinc-800">
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
@@ -773,7 +773,7 @@ export default function OrganizationSettingsPage() {
             <Button
               type="submit"
               disabled={creating || !user?.isAdmin}
-              className="disabled:bg-gray-400 disabled:cursor-not-allowed bg-neutral-600 hover:bg-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-800 text-white dark:text-zinc-100"
+              className="disabled:bg-neutral-400 disabled:cursor-not-allowed bg-neutral-600 hover:bg-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-800 text-white dark:text-zinc-100"
               title={!user?.isAdmin ? "Only admins can create invite links" : undefined}
             >
               <Link className="w-4 h-4 mr-2" />
@@ -862,7 +862,7 @@ export default function OrganizationSettingsPage() {
         open={removeMemberDialog.open}
         onOpenChange={(open) => setRemoveMemberDialog({ open, memberId: "", memberName: "" })}
       >
-        <AlertDialogContent className="bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800">
+        <AlertDialogContent className="bg-white dark:bg-zinc-950 border border-neutral-200 dark:border-zinc-800">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground dark:text-zinc-100">
               Remove team member
@@ -873,7 +873,7 @@ export default function OrganizationSettingsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-white dark:bg-zinc-900 text-foreground dark:text-zinc-100 border border-gray-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+            <AlertDialogCancel className="bg-white dark:bg-zinc-900 text-foreground dark:text-zinc-100 border border-neutral-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -890,7 +890,7 @@ export default function OrganizationSettingsPage() {
         open={deleteInviteDialog.open}
         onOpenChange={(open) => setDeleteInviteDialog({ open, inviteToken: "", inviteName: "" })}
       >
-        <AlertDialogContent className="bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800">
+        <AlertDialogContent className="bg-white dark:bg-zinc-950 border border-neutral-200 dark:border-zinc-800">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground dark:text-zinc-100">
               Delete invite link
@@ -901,7 +901,7 @@ export default function OrganizationSettingsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-white dark:bg-zinc-900 text-foreground dark:text-zinc-100 border border-gray-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+            <AlertDialogCancel className="bg-white dark:bg-zinc-900 text-foreground dark:text-zinc-100 border border-neutral-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -920,7 +920,7 @@ export default function OrganizationSettingsPage() {
           setErrorDialog({ open, title: "", description: "", variant: "error" })
         }
       >
-        <AlertDialogContent className="bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800">
+        <AlertDialogContent className="bg-white dark:bg-zinc-950 border border-neutral-200 dark:border-zinc-800">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground dark:text-zinc-100">
               {errorDialog.title}

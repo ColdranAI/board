@@ -477,7 +477,7 @@ export function Note({
   return (
     <div
       className={cn(
-        "rounded-lg shadow-lg select-none group transition-all duration-200 flex flex-col border border-gray-200 dark:border-gray-600 box-border",
+        "rounded-lg shadow-lg select-none group transition-all duration-200 flex flex-col border border-neutral-200 dark:border-neutral-600 box-border",
         className
       )}
       style={{
@@ -495,7 +495,7 @@ export function Note({
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-gray-700 dark:text-gray-200 truncate max-w-20">
+            <span className="text-sm font-bold text-neutral-700 dark:text-neutral-200 truncate max-w-20">
               {note.user.name ? note.user.name.split(" ")[0] : note.user.email.split("@")[0]}
             </span>
             <div className="flex flex-col">
@@ -519,7 +519,7 @@ export function Note({
                   e.stopPropagation();
                   onDelete?.(note.id);
                 }}
-                className="p-1 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded"
+                className="p-1 text-neutral-600 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-400 rounded"
                 variant="ghost"
                 size="icon"
               >
@@ -534,7 +534,7 @@ export function Note({
                   e.stopPropagation();
                   onArchive(note.id);
                 }}
-                className="p-1 text-gray-600 dark:text-gray-400 hover:text-neutral-600 dark:hover:text-neutral-400 rounded"
+                className="p-1 text-neutral-600 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-400 rounded"
                 variant="ghost"
                 size="icon"
                 title="Archive note"
@@ -550,7 +550,7 @@ export function Note({
                   e.stopPropagation();
                   onUnarchive(note.id);
                 }}
-                className="p-1 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 rounded"
+                className="p-1 text-neutral-600 dark:text-neutral-400 hover:text-green-600 dark:hover:text-green-400 rounded"
                 variant="ghost"
                 size="icon"
                 title="Unarchive note"
@@ -567,7 +567,7 @@ export function Note({
           <textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
-            className="w-full h-full p-2 bg-transparent border-none resize-none focus:outline-none text-base leading-7 text-gray-800 dark:text-gray-200"
+            className="w-full h-full p-2 bg-transparent border-none resize-none focus:outline-none text-base leading-7 text-neutral-800 dark:text-neutral-200"
             placeholder="Enter note content..."
             onBlur={handleStopEdit}
             onKeyDown={(e) => {
@@ -641,7 +641,7 @@ export function Note({
                         setAddingItem(false);
                         setNewItemContent("");
                       }}
-                      className="p-1 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded"
+                      className="p-1 text-neutral-600 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-400 rounded"
                       variant="ghost"
                       size="icon"
                     >
@@ -654,7 +654,7 @@ export function Note({
               {/* Content as text if no checklist items */}
               {(!note.checklistItems || note.checklistItems.length === 0) && !isEditing && (
                 <div
-                  className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap leading-relaxed cursor-pointer"
+                  className="text-sm text-neutral-900 dark:text-neutral-100 whitespace-pre-wrap leading-relaxed cursor-pointer"
                   onClick={handleStartEdit}
                 >
                   {note.content || ""}

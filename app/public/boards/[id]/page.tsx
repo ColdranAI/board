@@ -388,7 +388,7 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="min-h-screen max-w-screen bg-background dark:bg-zinc-950">
-      <div className="bg-card dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shadow-sm">
+      <div className="bg-card dark:bg-zinc-900 border-b border-neutral-200 dark:border-zinc-800 shadow-sm">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-3">
             <Link href="/" className="flex-shrink-0 pl-4 sm:pl-2 lg:pl-4">
@@ -435,7 +435,7 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
                 placeholder="Search notes..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-64 pl-10 pr-4 py-2 border border-gray-200 dark:border-zinc-800 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:focus:ring-zinc-600 focus:border-transparent text-sm bg-background dark:bg-zinc-900 text-foreground dark:text-zinc-100 placeholder:text-muted-foreground dark:placeholder:text-zinc-400"
+                className="w-64 pl-10 pr-4 py-2 border border-neutral-200 dark:border-zinc-800 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:focus:ring-zinc-600 focus:border-transparent text-sm bg-background dark:bg-zinc-900 text-foreground dark:text-zinc-100 placeholder:text-muted-foreground dark:placeholder:text-zinc-400"
               />
             </div>
 
@@ -465,18 +465,18 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                  <div className="w-6 h-6 bg-neutral-300 dark:bg-neutral-600 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
                       {note.user.name
                         ? note.user.name.charAt(0).toUpperCase()
                         : note.user.email.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">
+                  <span className="text-xs text-neutral-600 dark:text-neutral-400 font-medium">
                     {note.user.name || note.user.email.split("@")[0]}
                   </span>
                 </div>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-neutral-500 dark:text-neutral-400">
                   {new Date(note.createdAt).toLocaleDateString()}
                 </span>
               </div>
@@ -492,13 +492,13 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
                             type="checkbox"
                             checked={item.checked}
                             disabled
-                            className="w-4 h-4 rounded border-gray-300 text-neutral-600 focus:ring-neutral-500 disabled:opacity-50"
+                            className="w-4 h-4 rounded border-neutral-300 text-neutral-600 focus:ring-neutral-500 disabled:opacity-50"
                           />
                           <span
                             className={`text-sm flex-1 ${
                               item.checked
-                                ? "line-through text-gray-500 dark:text-gray-400"
-                                : "text-gray-900 dark:text-gray-100"
+                                ? "line-through text-neutral-500 dark:text-neutral-400"
+                                : "text-neutral-900 dark:text-neutral-100"
                             }`}
                           >
                             {item.content}
@@ -507,7 +507,7 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
                       ))}
                   </div>
                 ) : (
-                  <div className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap leading-relaxed">
+                  <div className="text-sm text-neutral-900 dark:text-neutral-100 whitespace-pre-wrap leading-relaxed">
                     {note.content}
                   </div>
                 )}
@@ -520,10 +520,10 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
               <div className="text-6xl mb-4">📝</div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+              <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-2">
                 No notes found
               </h3>
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-neutral-500 dark:text-neutral-400">
                 {searchTerm || selectedAuthor || dateRange.startDate || dateRange.endDate
                   ? "Try adjusting your filters to see more notes."
                   : "This board doesn't have any notes yet."}

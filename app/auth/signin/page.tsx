@@ -77,7 +77,7 @@ function SignInContent() {
   if (isSubmitted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-slate-50 dark:from-zinc-950 dark:to-zinc-900 p-4 sm:p-6">
-        <Card className="w-full max-w-sm sm:max-w-md bg-white/95 dark:bg-zinc-900/95 border border-gray-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="w-full max-w-sm sm:max-w-md bg-white/95 dark:bg-zinc-900/95 border border-neutral-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="text-center">
             <div className="mx-auto w-12 h-12 bg-green-100 dark:bg-green-900/40 rounded-full flex items-center justify-center mb-4 ring-1 ring-green-200/60 dark:ring-green-800/40">
               <Mail className="w-6 h-6 text-green-700 dark:text-green-400" />
@@ -95,13 +95,13 @@ function SignInContent() {
               Click the link in the email to sign in to your account. The link will expire in 24
               hours.
             </p>
-            <p className="text-sm text-gray-500 dark:text-zinc-500 text-center mb-4">
+            <p className="text-sm text-neutral-500 dark:text-zinc-500 text-center mb-4">
               It may take up to 2 minutes for the email to arrive.
             </p>
             <div className="space-y-2">
               <Button
                 variant="outline"
-                className="w-full justify-between bg-white border-gray-200 text-gray-900 hover:bg-gray-50 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-900 transition-colors active:scale-95"
+                className="w-full justify-between bg-white border-neutral-200 text-neutral-900 hover:bg-neutral-50 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-900 transition-colors active:scale-95"
                 onClick={() => window.open("https://mail.google.com", "_blank")}
               >
                 Open Gmail
@@ -109,7 +109,7 @@ function SignInContent() {
               </Button>
               <Button
                 variant="outline"
-                className="w-full justify-between bg-white border-gray-200 text-gray-900 hover:bg-gray-50 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-900 transition-colors active:scale-95"
+                className="w-full justify-between bg-white border-neutral-200 text-neutral-900 hover:bg-neutral-50 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-900 transition-colors active:scale-95"
                 onClick={() => window.open("https://outlook.live.com", "_blank")}
               >
                 Open Outlook
@@ -120,7 +120,7 @@ function SignInContent() {
           <CardFooter>
             <Button
               variant="outline"
-              className="w-full bg-white border-gray-200 text-gray-900 hover:bg-gray-50 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-900 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-neutral-500 dark:focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900"
+              className="w-full bg-white border-neutral-200 text-neutral-900 hover:bg-neutral-50 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-900 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-neutral-500 dark:focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900"
               onClick={handleResendEmail}
               disabled={isResending}
               aria-busy={isResending}
@@ -144,7 +144,7 @@ function SignInContent() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-slate-50 dark:from-zinc-950 dark:to-zinc-900 p-4 sm:p-6">
-      <Card className="w-full bg-white max-w-sm sm:max-w-md dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
+      <Card className="w-full bg-white max-w-sm sm:max-w-md dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
         <CardHeader className="text-center">
           <div className="mx-auto w-12 h-12 bg-neutral-100 dark:bg-neutral-900/40 rounded-full flex items-center justify-center mb-4 ring-1 ring-neutral-200/60 dark:ring-neutral-800/40">
             <Image src="/logo/Coldboard.svg" alt="Coldboard Logo" width={48} height={48} />
@@ -180,7 +180,7 @@ function SignInContent() {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading || !!searchParams.get("email")}
                 required
-                className="h-12 bg-white border-gray-300 text-foreground placeholder:text-gray-400 hover:border-gray-400  transition-colors"
+                className="h-12 bg-white border-neutral-300 text-foreground placeholder:text-neutral-400 hover:border-neutral-400  transition-colors"
               />
             </div>
           </CardContent>
@@ -207,7 +207,7 @@ function SignInContent() {
             {/* Divider */}
             <div className="relative mt-6 w-full">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-200 dark:border-zinc-700" />
+                <span className="w-full border-t border-neutral-200 dark:border-zinc-700" />
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="bg-white px-2 text-muted-foreground dark:bg-zinc-900 dark:text-zinc-400">
@@ -222,7 +222,7 @@ function SignInContent() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-12 justify-center bg-white border-gray-200 text-gray-900 hover:bg-gray-50 active:scale-[0.98] dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 cursor-pointer dark:hover:bg-zinc-900 transition-all"
+                className="w-full h-12 justify-center bg-white border-neutral-200 text-neutral-900 hover:bg-neutral-50 active:scale-[0.98] dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 cursor-pointer dark:hover:bg-zinc-900 transition-all"
                 onClick={() => signIn.social({ provider: "google", callbackURL: "/dashboard" })}
               >
                 <svg
@@ -255,7 +255,7 @@ function SignInContent() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-12 justify-center bg-white border-gray-200 text-gray-900 hover:bg-gray-50 active:scale-[0.98] dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 cursor-pointer dark:hover:bg-zinc-900 transition-all"
+                className="w-full h-12 justify-center bg-white border-neutral-200 text-neutral-900 hover:bg-neutral-50 active:scale-[0.98] dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 cursor-pointer dark:hover:bg-zinc-900 transition-all"
                 onClick={() => signIn.social({ provider: "github", callbackURL: "/dashboard" })}
               >
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
@@ -274,7 +274,7 @@ function SignInContent() {
 function LoadingFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-slate-50 dark:from-zinc-950 dark:to-zinc-900 p-4 sm:p-6">
-      <Card className="w-full max-w-sm sm:max-w-md bg-white/95 dark:bg-zinc-900/95 border border-gray-200 dark:border-zinc-800 shadow-sm">
+      <Card className="w-full max-w-sm sm:max-w-md bg-white/95 dark:bg-zinc-900/95 border border-neutral-200 dark:border-zinc-800 shadow-sm">
         <CardHeader className="text-center">
           <div className="mx-auto w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-4 dark:bg-zinc-800">
             <div className="w-6 h-6 animate-spin rounded-full border-2 border-muted-foreground border-t-foreground dark:border-zinc-700 dark:border-t-zinc-100" />

@@ -119,35 +119,35 @@ function DateRangePicker({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         className={cn(
-          "flex items-center space-x-2 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:focus:ring-zinc-500 focus:border-transparent transition-colors",
+          "flex items-center space-x-2 px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded-md bg-white dark:bg-zinc-900 hover:bg-neutral-50 dark:hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:focus:ring-zinc-500 focus:border-transparent transition-colors",
           disabled && "opacity-50 cursor-not-allowed",
           isOpen && "ring-2 ring-neutral-500 dark:ring-zinc-500 border-transparent"
         )}
       >
-        <Calendar className="w-4 h-4 text-gray-500 dark:text-zinc-400" />
-        <span className="text-gray-700 dark:text-zinc-200 truncate max-w-48 lg:max-w-64">
+        <Calendar className="w-4 h-4 text-neutral-500 dark:text-zinc-400" />
+        <span className="text-neutral-700 dark:text-zinc-200 truncate max-w-48 lg:max-w-64">
           {getDisplayText()}
         </span>
         <ChevronDown
           className={cn(
-            "w-4 h-4 text-gray-500 dark:text-zinc-400 transition-transform",
+            "w-4 h-4 text-neutral-500 dark:text-zinc-400 transition-transform",
             isOpen && "rotate-180"
           )}
         />
       </Button>
 
       {isOpen && (
-        <div className="absolute left-0 mt-2 w-80 bg-white dark:bg-zinc-900 rounded-md shadow-lg border border-gray-200 dark:border-zinc-700 z-50 p-4">
+        <div className="absolute left-0 mt-2 w-80 bg-white dark:bg-zinc-900 rounded-md shadow-lg border border-neutral-200 dark:border-zinc-700 z-50 p-4">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-gray-900 dark:text-zinc-100">
+              <h3 className="text-sm font-medium text-neutral-900 dark:text-zinc-100">
                 Select Date Range
               </h3>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-medium text-neutral-700 dark:text-zinc-300 mb-1">
                   Start Date
                 </label>
                 <Input
@@ -159,7 +159,7 @@ function DateRangePicker({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-medium text-neutral-700 dark:text-zinc-300 mb-1">
                   End Date
                 </label>
                 <Input
@@ -172,12 +172,12 @@ function DateRangePicker({
               </div>
             </div>
 
-            <div className="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-zinc-700">
+            <div className="flex justify-between items-center pt-3 border-t border-neutral-200 dark:border-zinc-700">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleClear}
-                className="text-gray-600 dark:text-zinc-300 hover:text-gray-800 dark:hover:text-zinc-100"
+                className="text-neutral-600 dark:text-zinc-300 hover:text-neutral-800 dark:hover:text-zinc-100"
               >
                 Clear
               </Button>

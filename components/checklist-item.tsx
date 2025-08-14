@@ -105,8 +105,8 @@ export function ChecklistItem({
           className={cn(
             "flex-1 text-sm leading-6 cursor-pointer select-none",
             item.checked
-              ? "line-through text-gray-500 dark:text-gray-400"
-              : "text-gray-900 dark:text-gray-100",
+              ? "line-through text-neutral-500 dark:text-neutral-400"
+              : "text-neutral-900 dark:text-neutral-100",
             !readonly && "rounded px-1 py-0.5"
           )}
           onClick={() => !readonly && onStartEdit?.(item.id)}

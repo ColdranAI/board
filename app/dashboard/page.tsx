@@ -56,6 +56,47 @@ const formSchema = z.object({
   description: z.string().optional(),
 });
 
+// -------------------------------------------------------------
+// Dashed "Create board" card
+// -------------------------------------------------------------
+function AddBoardCard({ onClick }: { onClick: () => void }) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
+  return (
+    <Card
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      className={[
+        "group h-40 cursor-pointer",
+        "border-2 border-dashed",
+        "border-neutral-300 dark:border-zinc-800",
+        "bg-transparent hover:bg-neutral-50/60 dark:hover:bg-zinc-900/50",
+        "transition-colors",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 dark:focus-visible:ring-zinc-600",
+      ].join(" ")}
+      title="Create a new board"
+    >
+      <CardHeader className="h-full flex items-center justify-center">
+        <div className="flex flex-col items-center gap-2 text-neutral-600 dark:text-neutral-300">
+                  <div className="p-3 rounded-full bg-neutral-200/50 dark:bg-neutral-700/50 group-hover:bg-neutral-200 dark:group-hover:bg-blue-800/50 transition-all duration-200">
+
+
+          <Plus className="w-6 h-6" />
+        </div>
+          <CardTitle className="text-base font-medium">Create board</CardTitle>
+        </div>
+      </CardHeader>
+    </Card>
+  );
+}
+
 export default function Dashboard() {
   const [boards, setBoards] = useState<DashboardBoard[]>([]);
   const [user, setUser] = useState<User | null>(null);
@@ -279,7 +320,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background dark:bg-zinc-950">
-      <nav className="bg-card dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shadow-sm">
+      <nav className="bg-card dark:bg-zinc-900 border-b border-neutral-200 dark:border-zinc-800 shadow-sm">
         <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
           <div className="flex items-center">
             <div className="flex-shrink-0">
@@ -290,22 +331,11 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <Button
-              onClick={() => {
-                form.reset({ name: "", description: "" });
-                setIsAddBoardDialogOpen(true);
-                setEditingBoard(null);
-              }}
-              className="flex items-center space-x-1 sm:space-x-2 bg-neutral-600 hover:bg-neutral-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 border-0 font-medium px-3 sm:px-4 py-2 dark:bg-neutral-500 dark:hover:bg-neutral-600"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Add Board</span>
-            </Button>
-
             <ProfileDropdown user={user} />
           </div>
         </div>
       </nav>
+
       <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {boards.length > 0 && (
           <div className="mb-6 sm:mb-8">
@@ -382,7 +412,7 @@ export default function Dashboard() {
         {boards.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
             <Link href="/boards/all-notes">
-              <Card className="group hover:shadow-lg transition-shadow cursor-pointer border-2 border-neutral-200 dark:border-neutral-900 bg-gradient-to-br from-neutral-50 to-indigo-50 dark:from-zinc-900 dark:to-zinc-950 dark:hover:bg-zinc-900/75">
+              <Card className="group cursor-pointer border border-neutral-300 dark:border-neutral-900 bg-gradient-to-br from-neutral-50 to-indigo-50 dark:from-zinc-900 dark:to-zinc-950 dark:hover:bg-zinc-900/75">
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
@@ -401,19 +431,18 @@ export default function Dashboard() {
               </Card>
             </Link>
 
-            {/* Archive Board */}
             <Link href="/boards/archive">
-              <Card className="group hover:shadow-lg transition-shadow cursor-pointer bg-gray-50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 dark:hover:bg-zinc-900/75">
+              <Card className="group cursor-pointer bg-neutral-50 dark:bg-zinc-900 border-neutral-200 dark:border-zinc-800 dark:hover:bg-zinc-900/75">
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
-                        <Archive className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                        <CardTitle className="text-lg text-gray-900 dark:text-gray-200">
+                        <Archive className="w-5 h-5 text-neutral-600 dark:text-neutral-400" />
+                        <CardTitle className="text-lg text-neutral-900 dark:text-neutral-200">
                           Archive
                         </CardTitle>
                       </div>
-                      <CardDescription className="text-gray-700 dark:text-gray-300">
+                      <CardDescription className="text-neutral-700 dark:text-neutral-300">
                         View archived notes
                       </CardDescription>
                     </div>
@@ -422,9 +451,18 @@ export default function Dashboard() {
               </Card>
             </Link>
 
+            {/* New dashed Create Board card */}
+            <AddBoardCard
+              onClick={() => {
+                form.reset({ name: "", description: "" });
+                setEditingBoard(null);
+                setIsAddBoardDialogOpen(true);
+              }}
+            />
+
             {boards.map((board) => (
               <Link href={`/boards/${board.id}`} key={board.id}>
-                <Card className="group hover:shadow-lg transition-shadow cursor-pointer bg-gray-50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 dark:hover:bg-zinc-900/75 h-40">
+                <Card className="group cursor-pointer bg-neutral-50 dark:bg-zinc-900 border-neutral-300 dark:border-zinc-800 dark:hover:bg-zinc-900/75 h-40">
                   <CardHeader className="flex flex-col h-full">
                     <div className="w-full">
                       <div className="flex items-center justify-between mb-1">
@@ -516,26 +554,17 @@ export default function Dashboard() {
             ))}
           </div>
         )}
+
         {boards.length === 0 && (
           <div className="text-center py-12">
-            <div className="text-muted-foreground dark:text-zinc-400 mb-4">
-              <Plus className="w-12 h-12 mx-auto" />
+            <div className="max-w-sm mx-auto">
+              <AddBoardCard
+                onClick={() => {
+                  setIsAddBoardDialogOpen(true);
+                  form.reset({ name: "", description: "" });
+                }}
+              />
             </div>
-            <h3 className="text-lg font-medium text-foreground dark:text-zinc-100 mb-2">
-              No boards yet
-            </h3>
-            <p className="text-muted-foreground dark:text-zinc-400 mb-4">
-              Get started by creating your first board
-            </p>
-            <Button
-              onClick={() => {
-                setIsAddBoardDialogOpen(true);
-                form.reset({ name: "", description: "" });
-              }}
-              className="dark:bg-neutral-500 dark:hover:bg-neutral-600"
-            >
-              Create your first board
-            </Button>
           </div>
         )}
       </div>
@@ -544,7 +573,7 @@ export default function Dashboard() {
         open={deleteConfirmDialog.open}
         onOpenChange={(open) => setDeleteConfirmDialog({ open, boardId: "", boardName: "" })}
       >
-        <AlertDialogContent className="bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800">
+        <AlertDialogContent className="bg-white dark:bg-zinc-950 border border-neutral-200 dark:border-zinc-800">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground dark:text-zinc-100">
               Delete board
@@ -555,7 +584,7 @@ export default function Dashboard() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-white dark:bg-zinc-900 text-foreground dark:text-zinc-100 border border-gray-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+            <AlertDialogCancel className="bg-white dark:bg-zinc-900 text-foreground dark:text-zinc-100 border border-neutral-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -572,7 +601,7 @@ export default function Dashboard() {
         open={errorDialog.open}
         onOpenChange={(open) => setErrorDialog({ open, title: "", description: "" })}
       >
-        <AlertDialogContent className="bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800">
+        <AlertDialogContent className="bg-white dark:bg-zinc-950 border border-neutral-200 dark:border-zinc-800">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground dark:text-zinc-100">
               {errorDialog.title}

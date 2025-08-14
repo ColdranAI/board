@@ -75,7 +75,7 @@ export default function ProfileSettingsPage() {
   }
 
   return (
-    <Card className="p-6 bg-white dark:bg-black border border-gray-200 dark:border-zinc-800">
+    <Card className="p-6 bg-white dark:bg-black border border-neutral-200 dark:border-zinc-800">
       <div className="space-y-6">
         <div>
           <h2 className="text-xl font-semibold text-foreground dark:text-zinc-100 mb-2">
@@ -118,7 +118,7 @@ export default function ProfileSettingsPage() {
           </div>
         </div>
 
-        <div className="pt-4 border-t border-gray-200 dark:border-zinc-800">
+        <div className="pt-4 border-t border-neutral-200 dark:border-zinc-800">
           <Button
             onClick={handleSaveProfile}
             disabled={
