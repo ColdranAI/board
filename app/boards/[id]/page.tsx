@@ -69,7 +69,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
   const searchParams = useSearchParams();
 
   // Update URL with current filter state
-  const updateURL = (
+  const updateURL = useCallback((
     newSearchTerm?: string,
     newDateRange?: { startDate: Date | null; endDate: Date | null },
     newAuthor?: string | null
@@ -99,10 +99,10 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
     const queryString = params.toString();
     const newURL = queryString ? `?${queryString}` : window.location.pathname;
     router.replace(newURL, { scroll: false });
-  };
+  }, [searchTerm, dateRange, selectedAuthor, router]);
 
   // Initialize filters from URL parameters
-  const initializeFiltersFromURL = () => {
+  const initializeFiltersFromURL = useCallback(() => {
     const urlSearchTerm = searchParams.get("search") || "";
     const urlStartDate = searchParams.get("startDate");
     const urlEndDate = searchParams.get("endDate");
@@ -130,7 +130,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
 
     setDateRange({ startDate, endDate });
     setSelectedAuthor(urlAuthor);
-  };
+  }, [searchParams]);
 
   // Enhanced responsive grid configuration
   const getResponsiveConfig = () => {
@@ -259,7 +259,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
   // Initialize filters from URL on mount
   useEffect(() => {
     initializeFiltersFromURL();
-  }, [initializeFiltersFromURL, searchParams]);
+  }, [initializeFiltersFromURL]);
 
 
   // Close dropdowns when clicking outside and handle escape key
@@ -338,7 +338,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, updateURL, debouncedSearchTerm, dateRange, selectedAuthor]);
+  }, [searchTerm, updateURL]);
 
   // Get unique authors from notes
   const getUniqueAuthors = (notes: Note[]) => {
@@ -554,7 +554,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
     return `${calculatedHeight}px`;
   }, [layoutNotes]);
 
-  const fetchBoardData = async () => {
+  const fetchBoardData = useCallback(async () => {
     try {
       // Get user info first to check authentication
       const userResponse = await fetch("/api/user");
@@ -635,7 +635,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
     } finally {
       setLoading(false);
     }
-  };
+  }, [boardId, router]);
 
   useEffect(() => {
     if (boardId) {

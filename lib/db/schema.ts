@@ -18,18 +18,18 @@ export const accounts = pgTable(
   "accounts",
   {
     id: text("id").primaryKey(),
-    userId: text("userId").notNull(),
-    accountId: text("accountId").notNull(),
-    providerId: text("providerId").notNull(),
-    accessToken: text("accessToken"),
-    refreshToken: text("refreshToken"),
-    idToken: text("idToken"),
-    accessTokenExpiresAt: timestamp("accessTokenExpiresAt"),
-    refreshTokenExpiresAt: timestamp("refreshTokenExpiresAt"),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    userId: text("user_id").notNull(),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    idToken: text("id_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at", { mode: "date" }),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { mode: "date" }),
     scope: text("scope"),
     password: text("password"),
-    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
   },
   (table) => ({
     providerAccountIdIdx: unique().on(table.providerId, table.accountId),
@@ -38,19 +38,23 @@ export const accounts = pgTable(
 
 export const sessions = pgTable("sessions", {
   id: text("id").primaryKey(),
-  sessionToken: text("sessionToken").notNull().unique(),
-  userId: text("userId").notNull(),
-  expires: timestamp("expires", { mode: "date" }).notNull(),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at", { mode: "date" }).notNull(),
+  userId: text("user_id").notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
 });
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
   name: text("name"),
   email: text("email").notNull().unique(),
-  emailVerified: timestamp("emailVerified", { mode: "date" }),
+  emailVerified: boolean("email_verified").$defaultFn(() => false).notNull(),
   image: text("image"),
-  createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
   organizationId: text("organizationId"),
   isAdmin: boolean("isAdmin").default(false).notNull(),
 });
@@ -59,8 +63,8 @@ export const organizations = pgTable("organizations", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   slackWebhookUrl: text("slackWebhookUrl"),
-  createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
+  createdAt: timestamp("createdAt", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updatedAt", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
 });
 
 export const boards = pgTable(
@@ -73,8 +77,8 @@ export const boards = pgTable(
     sendSlackUpdates: boolean("sendSlackUpdates").default(true).notNull(),
     organizationId: text("organizationId").notNull(),
     createdBy: text("createdBy").notNull(),
-    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("createdAt", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
   },
   (table) => ({
     idxBoardOrgCreated: index("idx_board_org_created").on(table.organizationId, table.createdAt),
@@ -91,8 +95,8 @@ export const notes = pgTable(
     slackMessageId: text("slackMessageId"),
     boardId: text("boardId").notNull(),
     createdBy: text("createdBy").notNull(),
-    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("createdAt", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
     deletedAt: timestamp("deletedAt", { mode: "date" }),
   },
   (table) => ({
@@ -111,8 +115,8 @@ export const checklistItems = pgTable(
     order: integer("order").default(0).notNull(),
     noteId: text("noteId").notNull(),
     slackMessageId: text("slackMessageId"),
-    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("createdAt", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
   },
   (table) => ({
     noteIdIdx: index().on(table.noteId),
@@ -127,7 +131,7 @@ export const organizationInvites = pgTable(
     email: text("email").notNull(),
     organizationId: text("organizationId").notNull(),
     invitedBy: text("invitedBy").notNull(),
-    createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("createdAt", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
     status: inviteStatusEnum("status").default("PENDING").notNull(),
   },
   (table) => ({
@@ -141,7 +145,7 @@ export const organizationSelfServeInvites = pgTable("organization_self_serve_inv
   name: text("name").notNull(),
   organizationId: text("organizationId").notNull(),
   createdBy: text("createdBy").notNull(),
-  createdAt: timestamp("createdAt", { mode: "date" }).defaultNow().notNull(),
+  createdAt: timestamp("createdAt", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
   expiresAt: timestamp("expiresAt", { mode: "date" }),
   usageLimit: integer("usageLimit"),
   usageCount: integer("usageCount").default(0).notNull(),
@@ -165,9 +169,9 @@ export const verification = pgTable("verification", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
-  expiresAt: timestamp("expires_at").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at", { mode: "date" }).notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
 });
 
 // Relations

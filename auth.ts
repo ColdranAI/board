@@ -1,11 +1,13 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { magicLink } from "better-auth/plugins";
+import { nextCookies } from "better-auth/next-js";
 import { db } from "@/lib/db";
 import { users, accounts, sessions, verification } from "@/lib/db/schema";
 import { Resend } from "resend";
+import { env } from "@/lib/env";
 
-const resend = new Resend(process.env.AUTH_RESEND_KEY);
+const resend = new Resend(env.AUTH_RESEND_KEY);
 
 async function sendEmail({ to, subject, text, html }: { to: string; subject: string; text: string; html?: string }) {
   try {
@@ -15,7 +17,7 @@ async function sendEmail({ to, subject, text, html }: { to: string; subject: str
     }
     
     await resend.emails.send({
-      from: process.env.EMAIL_FROM || "onboarding@resend.dev",
+      from: env.EMAIL_FROM || "onboarding@resend.dev",
       to,
       subject,
       text,
@@ -38,6 +40,7 @@ export const auth = betterAuth({
   }),
   
   plugins: [
+    nextCookies(),
     magicLink({
       sendMagicLink: async ({ email, token, url }) => {
         await sendEmail({
@@ -99,12 +102,12 @@ export const auth = betterAuth({
   
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: env.GOOGLE_CLIENT_ID!,
+      clientSecret: env.GOOGLE_CLIENT_SECRET!,
     },
     github: {
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      clientId: env.GITHUB_CLIENT_ID!,
+      clientSecret: env.GITHUB_CLIENT_SECRET!,
     },
   },
   
