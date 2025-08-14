@@ -6,7 +6,7 @@ import z from "zod";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { BetaBadge } from "@/components/ui/beta-badge";
+
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
@@ -40,7 +40,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { ProfileDropdown } from "@/components/profile-dropdown";
+
 
 // Dashboard-specific extended types
 export type DashboardBoard = Board & {
@@ -319,23 +319,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background dark:bg-zinc-950">
-      <nav className="bg-card dark:bg-zinc-900 border-b border-neutral-200 dark:border-zinc-800 shadow-sm">
-        <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <h1 className="text-xl sm:text-2xl font-bold text-neutral-600 dark:text-neutral-400 flex items-center gap-2">
-                Coldboard
-                <BetaBadge />
-              </h1>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2 sm:space-x-4">
-            <ProfileDropdown user={user} />
-          </div>
-        </div>
-      </nav>
-
+    <div className="bg-background dark:bg-zinc-950">
       <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {boards.length > 0 && (
           <div className="mb-6 sm:mb-8">
