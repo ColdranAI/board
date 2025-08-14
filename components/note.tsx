@@ -389,10 +389,40 @@ export function Note({
     }
   };
 
-  const handleStopEdit = () => {
+  const handleStopEdit = async () => {
     setIsEditing(false);
-    if (onUpdate && editContent !== note.content) {
-      onUpdate({ ...note, content: editContent });
+    if (editContent !== note.content) {
+      // Optimistic update
+      const updatedNote = { ...note, content: editContent };
+      onUpdate?.(updatedNote);
+
+      // Sync with database if enabled
+      if (syncDB) {
+        try {
+          const response = await fetch(`/api/boards/${note.boardId}/notes/${note.id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              content: editContent,
+            }),
+          });
+
+          if (response.ok) {
+            const { note: serverNote } = await response.json();
+            onUpdate?.(serverNote);
+          } else {
+            // Revert on error
+            onUpdate?.(note);
+            console.error("Error updating note content:", await response.text());
+          }
+        } catch (error) {
+          // Revert on error
+          onUpdate?.(note);
+          console.error("Error updating note content:", error);
+        }
+      }
     }
   };
 

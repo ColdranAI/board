@@ -668,26 +668,26 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
       const actualTargetBoardId = boardId === "all-notes" ? targetBoardId : boardId;
       const isAllNotesView = boardId === "all-notes";
 
-      const response = await fetch(
-        `/api/boards/${isAllNotesView ? "all-notes" : actualTargetBoardId}/notes`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            content: "",
-            checklistItems: [],
-            ...(isAllNotesView && { boardId: targetBoardId }),
-          }),
-        }
-      );
+      // Add 20ms delay for fast note creation
+      setTimeout(async () => {
+        const response = await fetch(
+          `/api/boards/${actualTargetBoardId}/notes/quick`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-      if (response.ok) {
-        const { note } = await response.json();
-        setNotes([...notes, note]);
-        setAddingChecklistItem(note.id);
-      }
+        if (response.ok) {
+          const { note } = await response.json();
+          setNotes([note, ...notes]);
+          setAddingChecklistItem(note.id);
+        } else {
+          console.error("Error creating note:", await response.text());
+        }
+      }, 20);
     } catch (error) {
       console.error("Error creating note:", error);
     }

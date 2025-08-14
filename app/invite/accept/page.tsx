@@ -140,7 +140,7 @@ async function autoVerifyAndCreateSession(email: string, token: string) {
         .values({
           id: crypto.randomUUID(),
           email,
-          emailVerified: new Date(), // Auto-verify since they clicked the invite link
+          emailVerified: true, // Auto-verify since they clicked the invite link
           createdAt: new Date(),
           updatedAt: new Date(),
         })
@@ -151,7 +151,7 @@ async function autoVerifyAndCreateSession(email: string, token: string) {
       // If user exists but isn't verified, verify them
       const updatedUserResult = await db
         .update(users)
-        .set({ emailVerified: new Date() })
+        .set({ emailVerified: true })
         .where(eq(users.id, user.id))
         .returning();
       

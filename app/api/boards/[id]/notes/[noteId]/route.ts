@@ -154,10 +154,13 @@ export async function PUT(
     if (color !== undefined) updateData.color = color;
     if (archivedAt !== undefined) updateData.archivedAt = archivedAt;
 
-    await db
-      .update(notes)
-      .set(updateData)
-      .where(eq(notes.id, noteId));
+    // Only update if there are values to set
+    if (Object.keys(updateData).length > 0) {
+      await db
+        .update(notes)
+        .set(updateData)
+        .where(eq(notes.id, noteId));
+    }
 
     // Handle checklist items if provided
     if (checklistData && Array.isArray(checklistData)) {

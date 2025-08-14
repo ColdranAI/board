@@ -167,7 +167,7 @@ async function autoCreateAccountAndJoin(token: string, formData: FormData) {
         .values({
           id: crypto.randomUUID(),
           email,
-          emailVerified: new Date(), // Auto-verify since they clicked the invite link
+          emailVerified: true, // Auto-verify since they clicked the invite link
           organizationId: invite.organizationId, // Auto-join the organization
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -198,7 +198,7 @@ async function autoCreateAccountAndJoin(token: string, formData: FormData) {
       await db
         .update(users)
         .set({
-          emailVerified: new Date(),
+          emailVerified: true,
           updatedAt: new Date(),
         })
         .where(eq(users.id, user.id));
@@ -216,15 +216,15 @@ async function autoCreateAccountAndJoin(token: string, formData: FormData) {
 
     // Create a session for the user
     const sessionToken = crypto.randomUUID();
-    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
 
     await db
       .insert(sessions)
       .values({
         id: crypto.randomUUID(),
-        sessionToken,
+        token: sessionToken,
         userId: user.id,
-        expires,
+        expiresAt,
       });
 
     // Redirect to signin for authentication

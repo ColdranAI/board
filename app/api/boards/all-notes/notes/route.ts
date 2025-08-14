@@ -1,7 +1,8 @@
 import { auth } from "@/auth";
-import { headers } from "next/headers";import { db } from "@/lib/db";
+import { headers } from "next/headers";
+import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { eq, and, isNull, desc } from "drizzle-orm";
+import { eq, and, isNull, desc, inArray } from "drizzle-orm";
 import { users, notes, boards, checklistItems } from "@/lib/db/schema";
 import { NOTE_COLORS } from "@/lib/constants";
 
@@ -61,7 +62,7 @@ export async function GET() {
     const allChecklistItems = noteIds.length > 0 ? await db
       .select()
       .from(checklistItems)
-      .where(eq(checklistItems.noteId, noteIds[0])) // This would need proper IN clause
+      .where(inArray(checklistItems.noteId, noteIds))
       : [];
 
     const notesWithChecklists = allNotes.map(note => ({
