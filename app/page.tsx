@@ -41,7 +41,7 @@ export default async function HomePage() {
                   <Button
                     asChild
                     size="lg"
-                    className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-white dark:text-black dark:hover:bg-zinc-100"
+                    className="bg-neutral-600 hover:bg-neutral-700 text-white dark:bg-white dark:text-black dark:hover:bg-zinc-100"
                   >
                     <Link href="/auth/signin">Get started - it&apos;s free</Link>
                   </Button>
@@ -67,8 +67,8 @@ export default async function HomePage() {
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
               <Card className="text-center dark:bg-zinc-900 dark:border-zinc-800">
                 <CardContent className="pt-6">
-                  <div className="w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-lg flex items-center justify-center dark:bg-blue-900/30">
-                    <StickyNote className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <div className="w-12 h-12 mx-auto mb-4 bg-neutral-100 rounded-lg flex items-center justify-center dark:bg-neutral-900/30">
+                    <StickyNote className="h-6 w-6 text-neutral-600 dark:text-neutral-400" />
                   </div>
                   <CardTitle className="mb-2">Sticky notes &amp; tasks</CardTitle>
                   <CardDescription className="dark:text-zinc-300">

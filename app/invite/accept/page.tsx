@@ -262,7 +262,7 @@ export default async function InviteAcceptPage({ searchParams }: InviteAcceptPag
             {/* Auto-verification Card */}
             <Card className="border-2">
               <CardHeader className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-neutral-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <span className="text-2xl font-bold text-white">
                     {invite.organization?.name.charAt(0).toUpperCase()}
                   </span>
@@ -275,7 +275,7 @@ export default async function InviteAcceptPage({ searchParams }: InviteAcceptPag
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <form action={autoVerifyAndCreateSession.bind(null, invite.email, token)}>
-                    <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+                    <Button type="submit" className="w-full bg-neutral-600 hover:bg-neutral-700">
                       Continue to Invitation
                     </Button>
                   </form>
@@ -323,9 +323,9 @@ export default async function InviteAcceptPage({ searchParams }: InviteAcceptPag
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-md mx-auto">
-            <Card className="border-2 border-blue-200">
+            <Card className="border-2 border-neutral-200">
               <CardHeader className="text-center">
-                <CardTitle className="text-xl text-blue-600">
+                <CardTitle className="text-xl text-neutral-600">
                   Invitation{" "}
                   {invite.status === "ACCEPTED" ? "Already Accepted" : "Already Declined"}
                 </CardTitle>
@@ -366,7 +366,7 @@ export default async function InviteAcceptPage({ searchParams }: InviteAcceptPag
           {/* Invitation Details Card */}
           <Card className="border-2">
             <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-neutral-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-2xl font-bold text-white">
                   {invite.organization?.name.charAt(0).toUpperCase()}
                 </span>

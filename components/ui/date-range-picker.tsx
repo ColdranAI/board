@@ -119,9 +119,9 @@ function DateRangePicker({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         className={cn(
-          "flex items-center space-x-2 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-zinc-500 focus:border-transparent transition-colors",
+          "flex items-center space-x-2 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:focus:ring-zinc-500 focus:border-transparent transition-colors",
           disabled && "opacity-50 cursor-not-allowed",
-          isOpen && "ring-2 ring-blue-500 dark:ring-zinc-500 border-transparent"
+          isOpen && "ring-2 ring-neutral-500 dark:ring-zinc-500 border-transparent"
         )}
       >
         <Calendar className="w-4 h-4 text-gray-500 dark:text-zinc-400" />
@@ -184,7 +184,7 @@ function DateRangePicker({
               <Button
                 size="sm"
                 onClick={handleApply}
-                className="bg-blue-600 text-white dark:bg-zinc-800 hover:bg-blue-700 dark:hover:bg-zinc-700"
+                className="bg-neutral-600 text-white dark:bg-zinc-800 hover:bg-neutral-700 dark:hover:bg-zinc-700"
               >
                 Apply
               </Button>

@@ -882,7 +882,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
           <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:space-x-3 w-full sm:w-auto">
             {/* Company Name */}
             <Link href="/dashboard" className="flex-shrink-0 pl-4 sm:pl-2 lg:pl-4">
-              <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400 flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-neutral-600 dark:text-neutral-400 flex items-center gap-2">
                 Coldboard
                 <BetaBadge />
               </h1>
@@ -892,7 +892,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
             <div className="relative board-dropdown flex-1 sm:flex-none">
               <Button
                 onClick={() => setShowBoardDropdown(!showBoardDropdown)}
-                className="flex items-center justify-between border border-gray-200 dark:border-zinc-800 space-x-2 text-foreground dark:text-zinc-100 hover:text-foreground dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-zinc-600 rounded-md px-3 py-2 cursor-pointer w-full sm:w-auto"
+                className="flex items-center justify-between border border-gray-200 dark:border-zinc-800 space-x-2 text-foreground dark:text-zinc-100 hover:text-foreground dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:focus:ring-zinc-600 rounded-md px-3 py-2 cursor-pointer w-full sm:w-auto"
               >
                 <div>
                   <div className="text-sm font-semibold text-foreground dark:text-zinc-100">
@@ -918,7 +918,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
                       href="/boards/all-notes"
                       className={`block px-4 py-2 text-sm hover:bg-accent dark:hover:bg-zinc-800 ${
                         boardId === "all-notes"
-                          ? "bg-blue-50 dark:bg-zinc-900/70 text-blue-700 dark:text-blue-300"
+                          ? "bg-neutral-50 dark:bg-zinc-900/70 text-neutral-700 dark:text-neutral-300"
                           : "text-foreground dark:text-zinc-100"
                       }`}
                       onClick={() => setShowBoardDropdown(false)}
@@ -934,7 +934,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
                       href="/boards/archive"
                       className={`block px-4 py-2 text-sm hover:bg-accent dark:hover:bg-zinc-800 ${
                         boardId === "archive"
-                          ? "bg-blue-50 dark:bg-zinc-900/70 text-blue-700 dark:text-blue-300"
+                          ? "bg-neutral-50 dark:bg-zinc-900/70 text-neutral-700 dark:text-neutral-300"
                           : "text-foreground dark:text-zinc-100"
                       }`}
                       onClick={() => setShowBoardDropdown(false)}
@@ -954,7 +954,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
                         href={`/boards/${b.id}`}
                         className={`block px-4 py-2 text-sm hover:bg-accent dark:hover:bg-zinc-800 ${
                           b.id === boardId
-                            ? "bg-blue-50 dark:bg-zinc-900/70 text-blue-700 dark:text-blue-300"
+                            ? "bg-neutral-50 dark:bg-zinc-900/70 text-neutral-700 dark:text-neutral-300"
                             : "text-foreground dark:text-zinc-100"
                         }`}
                         onClick={() => setShowBoardDropdown(false)}
@@ -1037,7 +1037,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
                 }}
-                className="w-full sm:w-64 pl-10 pr-8 py-2 border border-gray-200 dark:border-zinc-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-zinc-600 focus:border-transparent text-sm bg-background dark:bg-zinc-900 text-foreground dark:text-zinc-100 placeholder:text-muted-foreground dark:placeholder:text-zinc-400"
+                className="w-full sm:w-64 pl-10 pr-8 py-2 border border-gray-200 dark:border-zinc-800 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:focus:ring-zinc-600 focus:border-transparent text-sm bg-background dark:bg-zinc-900 text-foreground dark:text-zinc-100 placeholder:text-muted-foreground dark:placeholder:text-zinc-400"
               />
               {searchTerm && (
                 <Button
@@ -1061,7 +1061,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
                   handleAddNote();
                 }
               }}
-              className="flex items-center justify-center w-10 h-10 sm:w-auto sm:h-auto sm:space-x-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer font-medium"
+              className="flex items-center justify-center w-10 h-10 sm:w-auto sm:h-auto sm:space-x-2 bg-neutral-600 hover:bg-neutral-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer font-medium"
             >
               <Plus className="w-4 h-4" />
               <span className="hidden sm:inline">Add Note</span>
@@ -1237,7 +1237,7 @@ export default function BoardPage({ params }: { params: Promise<{ id: string }> 
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-zinc-100"
+                  className="bg-neutral-600 hover:bg-neutral-700 text-white dark:bg-neutral-500 dark:hover:bg-neutral-600 dark:text-zinc-100"
                 >
                   Create board
                 </Button>

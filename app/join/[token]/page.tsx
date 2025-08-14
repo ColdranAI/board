@@ -394,7 +394,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
             {/* Join Form */}
             <Card className="border-2">
               <CardHeader className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-neutral-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <span className="text-2xl font-bold text-white">
                     {invite.organization?.name.charAt(0).toUpperCase()}
                   </span>
@@ -426,7 +426,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
                       id="email"
                       name="email"
                       required
-                      className="w-full px-3 py-2 border border-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500"
                       placeholder="Enter your email address"
                     />
                   </div>
@@ -440,7 +440,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
                     Already have an account?{" "}
                     <a
                       href={`/auth/signin?callbackUrl=${encodeURIComponent(`/join/${token}`)}`}
-                      className="text-blue-600 hover:text-blue-500"
+                      className="text-neutral-600 hover:text-neutral-500"
                     >
                       Sign in instead
                     </a>
@@ -476,9 +476,9 @@ export default async function JoinPage({ params }: JoinPageProps) {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 text-black dark:text-white">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-md mx-auto">
-            <Card className="border-2 border-blue-200">
+            <Card className="border-2 border-neutral-200">
               <CardHeader className="text-center">
-                <CardTitle className="text-xl text-blue-600">Already a Member</CardTitle>
+                <CardTitle className="text-xl text-neutral-600">Already a Member</CardTitle>
                 <CardDescription>
                   You are already a member of {invite.organization?.name}.
                 </CardDescription>
@@ -534,7 +534,7 @@ export default async function JoinPage({ params }: JoinPageProps) {
           {/* Invitation Details Card */}
           <Card className="border-2">
             <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-neutral-600 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-2xl font-bold text-white">
                   {invite.organization?.name.charAt(0).toUpperCase()}
                 </span>

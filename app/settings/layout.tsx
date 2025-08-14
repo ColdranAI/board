@@ -51,7 +51,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
         <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
           <div className="flex items-center space-x-4 sm:space-x-6">
             <Link href="/dashboard" className="flex-shrink-0">
-              <h1 className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400 flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-bold text-neutral-600 dark:text-neutral-400 flex items-center gap-2">
                 Coldboard <BetaBadge />
               </h1>
             </Link>
@@ -81,7 +81,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                 href="/settings"
                 className={`flex-shrink-0 lg:w-full flex items-center px-3 sm:px-4 py-2 sm:py-3 text-left rounded-lg transition-colors ${
                   isProfileActive
-                    ? "bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900"
+                    ? "bg-neutral-50 dark:bg-neutral-900/50 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-900"
                     : "text-foreground dark:text-zinc-100 hover:bg-accent dark:hover:bg-zinc-800"
                 }`}
               >
@@ -92,7 +92,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                 href="/settings/organization"
                 className={`flex-shrink-0 lg:w-full flex items-center px-3 sm:px-4 py-2 sm:py-3 text-left rounded-lg transition-colors ${
                   isOrganizationActive
-                    ? "bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900"
+                    ? "bg-neutral-50 dark:bg-neutral-900/50 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-900"
                     : "text-foreground dark:text-zinc-100 hover:bg-accent dark:hover:bg-zinc-800"
                 }`}
               >

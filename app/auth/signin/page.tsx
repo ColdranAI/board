@@ -120,7 +120,7 @@ function SignInContent() {
           <CardFooter>
             <Button
               variant="outline"
-              className="w-full bg-white border-gray-200 text-gray-900 hover:bg-gray-50 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-900 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900"
+              className="w-full bg-white border-gray-200 text-gray-900 hover:bg-gray-50 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-900 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-neutral-500 dark:focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900"
               onClick={handleResendEmail}
               disabled={isResending}
               aria-busy={isResending}
@@ -146,7 +146,7 @@ function SignInContent() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-slate-50 dark:from-zinc-950 dark:to-zinc-900 p-4 sm:p-6">
       <Card className="w-full bg-white max-w-sm sm:max-w-md dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
         <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center mb-4 ring-1 ring-blue-200/60 dark:ring-blue-800/40">
+          <div className="mx-auto w-12 h-12 bg-neutral-100 dark:bg-neutral-900/40 rounded-full flex items-center justify-center mb-4 ring-1 ring-neutral-200/60 dark:ring-neutral-800/40">
             <Image src="/logo/Coldboard.svg" alt="Coldboard Logo" width={48} height={48} />
           </div>
           <CardTitle className="text-xl sm:text-2xl font-bold text-foreground dark:text-zinc-100 flex items-center gap-2 justify-center">
@@ -162,8 +162,8 @@ function SignInContent() {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {searchParams.get("email") && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-3">
-                <p className="text-sm text-blue-800 dark:text-blue-300">
+              <div className="bg-neutral-50 dark:bg-neutral-900/20 border border-neutral-200 dark:border-neutral-800 rounded-md p-3">
+                <p className="text-sm text-neutral-800 dark:text-neutral-300">
                   📧 You&apos;re signing in from an organization invitation
                 </p>
               </div>
@@ -187,7 +187,7 @@ function SignInContent() {
           <CardFooter className="flex flex-col">
             <Button
               type="submit"
-              className="w-full h-12 font-medium mt-4 bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.98] dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700 transition-all focus-visible:ring-2 focus-visible:ring-blue-500 dark:focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900"
+              className="w-full h-12 font-medium mt-4 bg-neutral-600 text-white hover:bg-neutral-700 active:scale-[0.98] dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700 transition-all focus-visible:ring-2 focus-visible:ring-neutral-500 dark:focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-900"
               disabled={isLoading || !email}
               aria-busy={isLoading}
             >

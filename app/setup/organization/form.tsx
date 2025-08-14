@@ -51,12 +51,12 @@ export default function OrganizationSetupForm({ onSubmit }: OrganizationSetupFor
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 dark:text-zinc-400">
-      <div className="space-y-2">
+      <div className="space-y-3">
         <Label htmlFor="organizationName">Organization Name</Label>
         <Input
           id="organizationName"
           type="text"
-          placeholder="Enter your organization name"
+          placeholder="Coldran"
           value={orgName}
           onChange={(e) => setOrgName(e.target.value)}
           required
@@ -64,15 +64,15 @@ export default function OrganizationSetupForm({ onSubmit }: OrganizationSetupFor
         />
       </div>
 
-      <div className="space-y-4">
-        <Label>Team Member Email Addresses</Label>
-
+      <div className="space-y-3">
+        
+        <Label>Invite Humans</Label>
         <div className="space-y-3">
           {teamEmails.map((email, index) => (
             <div key={index} className="flex gap-2">
               <Input
                 type="email"
-                placeholder="teammate@company.com"
+                placeholder="arjun@coldran.com"
                 value={email}
                 onChange={(e) => updateEmail(index, e.target.value)}
                 className="flex-1"
@@ -96,13 +96,11 @@ export default function OrganizationSetupForm({ onSubmit }: OrganizationSetupFor
           <Plus className="h-4 w-4 mr-2" />
           Add Team Member
         </Button>
+        <p className="text-xs">{`we'll send invites to the email addresses.`}</p>
 
-        <p className="text-xs text-muted-foreground">
-          {`we'll send invitations to join your organization to these email addresses.`}
-        </p>
       </div>
 
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
+      <Button type="submit" className="w-full bg-neutral-950 active:bg-neutral-700 hover:bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-950" disabled={isSubmitting}>
         {isSubmitting ? "Creating..." : hasValidEmails() ? "Save & Send Invites" : "Save"}
       </Button>
     </form>

@@ -502,7 +502,7 @@ export function Note({
               {showBoardName && note.board && (
                 <Link
                   href={`/boards/${note.board.id}`}
-                  className="text-xs text-blue-600 dark:text-blue-400 opacity-80 font-medium truncate max-w-20 hover:opacity-100 transition-opacity"
+                  className="text-xs text-neutral-600 dark:text-neutral-400 opacity-80 font-medium truncate max-w-20 hover:opacity-100 transition-opacity"
                 >
                   {note.board.name}
                 </Link>
@@ -534,7 +534,7 @@ export function Note({
                   e.stopPropagation();
                   onArchive(note.id);
                 }}
-                className="p-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded"
+                className="p-1 text-gray-600 dark:text-gray-400 hover:text-neutral-600 dark:hover:text-neutral-400 rounded"
                 variant="ghost"
                 size="icon"
                 title="Archive note"

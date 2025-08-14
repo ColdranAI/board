@@ -74,16 +74,16 @@ function FilterPopover({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         className={cn(
-          "flex items-center space-x-2 px-3 py-2 text-sm border border-gray-200 dark:border-zinc-800 rounded-md bg-card dark:bg-zinc-900 hover:bg-accent dark:hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-zinc-600 focus:border-transparent transition-colors",
+          "flex items-center space-x-2 px-3 py-2 text-sm border border-gray-200 dark:border-zinc-800 rounded-md bg-card dark:bg-zinc-900 hover:bg-accent dark:hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:focus:ring-zinc-600 focus:border-transparent transition-colors",
           disabled && "opacity-50 cursor-not-allowed",
-          isOpen && "ring-2 ring-blue-500 dark:ring-zinc-600 border-transparent"
+          isOpen && "ring-2 ring-neutral-500 dark:ring-zinc-600 border-transparent"
         )}
       >
         <Filter className="w-4 h-4 text-muted-foreground dark:text-zinc-400" />
         <span className="text-foreground dark:text-zinc-100">
           Filter
           {getFilterCount() > 0 && (
-            <span className="ml-1 px-1.5 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
+            <span className="ml-1 px-1.5 py-0.5 text-xs bg-neutral-100 dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 rounded">
               {getFilterCount()}
             </span>
           )}
@@ -125,7 +125,7 @@ function FilterPopover({
                   className={cn(
                     "w-full text-left px-3 py-2 text-sm rounded-md hover:bg-accent dark:hover:bg-zinc-800 flex items-center space-x-3",
                     !selectedAuthor
-                      ? "bg-blue-50 dark:bg-zinc-900/70 text-blue-700 dark:text-blue-300"
+                      ? "bg-neutral-50 dark:bg-zinc-900/70 text-neutral-700 dark:text-neutral-300"
                       : "text-foreground dark:text-zinc-100"
                   )}
                 >
@@ -139,11 +139,11 @@ function FilterPopover({
                     className={cn(
                       "w-full text-left px-3 py-2 text-sm rounded-md hover:bg-accent dark:hover:bg-zinc-800 flex items-center space-x-3",
                       selectedAuthor === author.id
-                        ? "bg-blue-50 dark:bg-zinc-900/70 text-blue-700 dark:text-blue-300"
+                        ? "bg-neutral-50 dark:bg-zinc-900/70 text-neutral-700 dark:text-neutral-300"
                         : "text-foreground dark:text-zinc-100"
                     )}
                   >
-                    <div className="w-6 h-6 bg-blue-500 dark:bg-zinc-800 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-6 h-6 bg-neutral-500 dark:bg-zinc-800 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-medium text-white">
                         {author.name.charAt(0).toUpperCase()}
                       </span>

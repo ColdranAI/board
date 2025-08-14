@@ -135,10 +135,10 @@ export function DraggableItem({
 
   const combinedClassName = [
     className,
-    isDragging && "z-50 scale-100 bg-blue-50 dark:bg-blue-800/20",
+    isDragging && "z-50 scale-100 bg-neutral-50 dark:bg-neutral-800/20",
     disabled && "opacity-50",
-    !disabled && "hover:bg-blue-50 dark:hover:bg-blue-800/20",
-    active && active.id !== id && isOver && "opacity-60 bg-blue-600/10",
+    !disabled && "hover:bg-neutral-50 dark:hover:bg-neutral-800/20",
+    active && active.id !== id && isOver && "opacity-60 bg-neutral-600/10",
     // Prevent scrolling on mobile devices
     "touch-none sm:touch-auto",
   ]

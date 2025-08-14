@@ -122,31 +122,13 @@ export default async function OrganizationSetup() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-zinc-900 dark:to-zinc-950">
+    <div className="min-h-screen bg-gradient-to-br flex justify-center items-center from-slate-50 to-slate-100 dark:from-zinc-900 dark:to-zinc-950">
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        <div className="max-w-sm sm:max-w-md mx-auto space-y-6 sm:space-y-8">
-          <div className="text-center">
-            <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-blue-700 dark:text-blue-300">
-              Setup Your Organization
-            </h1>
-            <p className="text-sm sm:text-base text-muted-foreground dark:text-zinc-400">
-              Create your workspace and invite your team
-            </p>
-          </div>
-          <Card className="border-2 bg-white dark:bg-zinc-900 dark:border-zinc-800">
-            <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 dark:from-zinc-800 dark:to-blue-900 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-2xl font-bold text-white">
-                  {session.user.name?.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <CardTitle className="text-lg sm:text-xl text-blue-700 dark:text-blue-300">
-                Welcome, {session.user.name}!
-              </CardTitle>
-              <CardDescription className="text-sm sm:text-base text-muted-foreground dark:text-zinc-400">
-                Let&apos;s set up your organization
-              </CardDescription>
-            </CardHeader>
+        <div className="max-w-sm sm:max-w-md  mx-auto space-y-6 sm:space-y-8">
+          <Card className="border bg-white dark:bg-zinc-900 border-neutral-200 dark:border-zinc-800">
+            <CardTitle className="px-5">
+              Getting Started
+            </CardTitle>
             <CardContent>
               <OrganizationSetupForm onSubmit={createOrganization} />
             </CardContent>

@@ -283,7 +283,7 @@ export default function Dashboard() {
         <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <h1 className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400 flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-bold text-neutral-600 dark:text-neutral-400 flex items-center gap-2">
                 Coldboard
                 <BetaBadge />
               </h1>
@@ -296,7 +296,7 @@ export default function Dashboard() {
                 setIsAddBoardDialogOpen(true);
                 setEditingBoard(null);
               }}
-              className="flex items-center space-x-1 sm:space-x-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 border-0 font-medium px-3 sm:px-4 py-2 dark:bg-blue-500 dark:hover:bg-blue-600"
+              className="flex items-center space-x-1 sm:space-x-2 bg-neutral-600 hover:bg-neutral-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 border-0 font-medium px-3 sm:px-4 py-2 dark:bg-neutral-500 dark:hover:bg-neutral-600"
             >
               <Plus className="w-4 h-4" />
               <span className="hidden sm:inline">Add Board</span>
@@ -370,7 +370,7 @@ export default function Dashboard() {
                   )}
                 />
                 <DialogFooter>
-                  <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <Button type="submit" className="bg-neutral-600 hover:bg-neutral-700 text-white">
                     {editingBoard ? "Update board" : "Create board"}
                   </Button>
                 </DialogFooter>
@@ -382,17 +382,17 @@ export default function Dashboard() {
         {boards.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
             <Link href="/boards/all-notes">
-              <Card className="group hover:shadow-lg transition-shadow cursor-pointer border-2 border-blue-200 dark:border-blue-900 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-zinc-900 dark:to-zinc-950 dark:hover:bg-zinc-900/75">
+              <Card className="group hover:shadow-lg transition-shadow cursor-pointer border-2 border-neutral-200 dark:border-neutral-900 bg-gradient-to-br from-neutral-50 to-indigo-50 dark:from-zinc-900 dark:to-zinc-950 dark:hover:bg-zinc-900/75">
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
-                        <Grid3x3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                        <CardTitle className="text-lg text-blue-900 dark:text-blue-200">
+                        <Grid3x3 className="w-5 h-5 text-neutral-600 dark:text-neutral-400" />
+                        <CardTitle className="text-lg text-neutral-900 dark:text-neutral-200">
                           All Notes
                         </CardTitle>
                       </div>
-                      <CardDescription className="text-blue-700 dark:text-blue-300">
+                      <CardDescription className="text-neutral-700 dark:text-neutral-300">
                         View notes from all boards
                       </CardDescription>
                     </div>
@@ -431,7 +431,7 @@ export default function Dashboard() {
                         <CardTitle className="text-lg  w-3/4 dark:text-zinc-100">
                           {board.name}
                         </CardTitle>
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-nowrap bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-nowrap bg-neutral-100 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-200">
                           {board._count.notes} {board._count.notes === 1 ? "note" : "notes"}
                         </span>
                       </div>
@@ -443,7 +443,7 @@ export default function Dashboard() {
                               e.stopPropagation();
                               handleEditBoard(board);
                             }}
-                            className="md:opacity-0 md:group-hover:opacity-100 text-muted-foreground dark:text-zinc-400 hover:text-blue-500 dark:hover:text-blue-400 p-1 rounded transition-opacity"
+                            className="md:opacity-0 md:group-hover:opacity-100 text-muted-foreground dark:text-zinc-400 hover:text-neutral-500 dark:hover:text-neutral-400 p-1 rounded transition-opacity"
                             title={
                               user?.id === board.createdBy ? "Edit board" : "Edit board (Admin)"
                             }
@@ -493,7 +493,7 @@ export default function Dashboard() {
                             e.stopPropagation();
                             handleCopyPublicUrl(board.id);
                           }}
-                          className="flex items-center space-x-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                          className="flex items-center space-x-1 text-xs text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-300"
                           title="Copy public link"
                         >
                           {copiedBoardId === board.id ? (
@@ -532,7 +532,7 @@ export default function Dashboard() {
                 setIsAddBoardDialogOpen(true);
                 form.reset({ name: "", description: "" });
               }}
-              className="dark:bg-blue-500 dark:hover:bg-blue-600"
+              className="dark:bg-neutral-500 dark:hover:bg-neutral-600"
             >
               Create your first board
             </Button>

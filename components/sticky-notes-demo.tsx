@@ -50,7 +50,7 @@ const initialNotes: Note[] = [
   {
     id: "3",
     content: "",
-    color: "bg-blue-200/60",
+    color: "bg-neutral-200/60",
     archivedAt: null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

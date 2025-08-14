@@ -25,7 +25,7 @@ export function ProfileDropdown({ user }: Props) {
               src={user?.image || ""}
               alt={user?.name || ""}
             />
-            <AvatarFallback className="w-8 h-8 flex items-center justify-center rounded-full text-zinc-900 dark:text-zinc-100 bg-blue-500 ">
+            <AvatarFallback className="w-8 h-8 flex items-center justify-center rounded-full text-zinc-900 dark:text-zinc-100 bg-neutral-500 ">
               <span className="text-sm font-medium text-white">
                 {user?.name
                   ? user.name.charAt(0).toUpperCase()

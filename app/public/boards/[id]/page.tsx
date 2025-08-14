@@ -392,7 +392,7 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-3">
             <Link href="/" className="flex-shrink-0 pl-4 sm:pl-2 lg:pl-4">
-              <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400 flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-neutral-600 dark:text-neutral-400 flex items-center gap-2">
                 Coldboard
                 <BetaBadge />
               </h1>
@@ -435,7 +435,7 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
                 placeholder="Search notes..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-64 pl-10 pr-4 py-2 border border-gray-200 dark:border-zinc-800 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-zinc-600 focus:border-transparent text-sm bg-background dark:bg-zinc-900 text-foreground dark:text-zinc-100 placeholder:text-muted-foreground dark:placeholder:text-zinc-400"
+                className="w-64 pl-10 pr-4 py-2 border border-gray-200 dark:border-zinc-800 rounded-md focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:focus:ring-zinc-600 focus:border-transparent text-sm bg-background dark:bg-zinc-900 text-foreground dark:text-zinc-100 placeholder:text-muted-foreground dark:placeholder:text-zinc-400"
               />
             </div>
 
@@ -492,7 +492,7 @@ export default function PublicBoardPage({ params }: { params: Promise<{ id: stri
                             type="checkbox"
                             checked={item.checked}
                             disabled
-                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50"
+                            className="w-4 h-4 rounded border-gray-300 text-neutral-600 focus:ring-neutral-500 disabled:opacity-50"
                           />
                           <span
                             className={`text-sm flex-1 ${

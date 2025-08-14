@@ -171,7 +171,7 @@ test.describe("Board Name Link Functionality", () => {
     const boardLink = page.locator("a", { hasText: "Test Board 1" }).first();
 
     await expect(boardLink).toHaveClass(/text-xs/);
-    await expect(boardLink).toHaveClass(/text-blue-600/);
+    await expect(boardLink).toHaveClass(/text-neutral-600/);
     await expect(boardLink).toHaveClass(/font-medium/);
     await expect(boardLink).toHaveClass(/truncate/);
 

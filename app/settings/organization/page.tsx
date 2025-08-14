@@ -471,7 +471,7 @@ export default function OrganizationSettingsPage() {
               type="text"
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
-              placeholder="Enter organization name"
+              placeholder="Organization Name"
               className="mt-1 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
               disabled={!user?.isAdmin}
             />
@@ -481,7 +481,7 @@ export default function OrganizationSettingsPage() {
             <Button
               onClick={handleSaveOrganization}
               disabled={saving || orgName === originalOrgName || !user?.isAdmin}
-              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white dark:text-zinc-100"
+              className="bg-neutral-600 hover:bg-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white dark:text-zinc-100"
               title={!user?.isAdmin ? "Only admins can update organization settings" : undefined}
             >
               {saving ? "Saving..." : "Save Changes"}
@@ -522,7 +522,7 @@ export default function OrganizationSettingsPage() {
                 href="https://api.slack.com/apps"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline"
+                className="inline-flex items-center text-neutral-600 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 underline"
               >
                 Create Slack App
                 <ExternalLink className="w-3 h-3 ml-1" />
@@ -534,7 +534,7 @@ export default function OrganizationSettingsPage() {
             <Button
               onClick={handleSaveOrganization}
               disabled={saving || slackWebhookUrl === originalSlackWebhookUrl || !user?.isAdmin}
-              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white dark:text-zinc-100"
+              className="bg-neutral-600 hover:bg-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white dark:text-zinc-100"
               title={!user?.isAdmin ? "Only admins can update organization settings" : undefined}
             >
               {saving ? "Saving..." : "Save changes"}
@@ -566,7 +566,7 @@ export default function OrganizationSettingsPage() {
                 >
                   <div className="flex items-center space-x-3">
                     <div
-                      className={`w-10 h-10 ${member.isAdmin ? "bg-purple-500" : "bg-blue-500 dark:bg-zinc-700"} rounded-full flex items-center justify-center`}
+                      className={`w-10 h-10 ${member.isAdmin ? "bg-purple-500" : "bg-neutral-500 dark:bg-zinc-700"} rounded-full flex items-center justify-center`}
                     >
                       <span className="text-white font-medium">
                         {member.name
@@ -655,7 +655,7 @@ export default function OrganizationSettingsPage() {
             <Button
               type="submit"
               disabled={inviting || !user?.isAdmin}
-              className="disabled:bg-gray-400 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white dark:text-zinc-100"
+              className="disabled:bg-gray-400 disabled:cursor-not-allowed bg-neutral-600 hover:bg-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-800 text-white dark:text-zinc-100"
               title={!user?.isAdmin ? "Only admins can invite new team members" : undefined}
             >
               <UserPlus className="w-4 h-4 mr-2" />
@@ -773,7 +773,7 @@ export default function OrganizationSettingsPage() {
             <Button
               type="submit"
               disabled={creating || !user?.isAdmin}
-              className="disabled:bg-gray-400 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white dark:text-zinc-100"
+              className="disabled:bg-gray-400 disabled:cursor-not-allowed bg-neutral-600 hover:bg-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-800 text-white dark:text-zinc-100"
               title={!user?.isAdmin ? "Only admins can create invite links" : undefined}
             >
               <Link className="w-4 h-4 mr-2" />
@@ -788,7 +788,7 @@ export default function OrganizationSettingsPage() {
               {selfServeInvites.map((invite) => (
                 <div
                   key={invite.id}
-                  className="p-4 bg-blue-50 dark:bg-zinc-800 rounded-lg border border-blue-200 dark:border-zinc-700"
+                  className="p-4 bg-neutral-50 dark:bg-zinc-800 rounded-lg border border-neutral-200 dark:border-zinc-700"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -833,7 +833,7 @@ export default function OrganizationSettingsPage() {
                         onClick={() => copyInviteLink(invite.token)}
                         variant="outline"
                         size="sm"
-                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-zinc-800"
+                        className="text-neutral-600 hover:text-neutral-700 hover:bg-neutral-50 dark:text-neutral-400 dark:hover:text-neutral-300 dark:hover:bg-zinc-800"
                         title="Copy invite link"
                       >
                         <Copy className="w-4 h-4" />
